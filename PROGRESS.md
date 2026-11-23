@@ -15,6 +15,7 @@ Last updated: 2026-11-23
 - Reveal phase — `frontend/src/App.tsx` — displays song details and guess result.
 - Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface, chronological timeline, and timeline carry-forward between rounds.
 - Multi-round gameplay state — `frontend/src/App.tsx` — tracks round number, used songs, official timeline, and draws the next unused configured song after placement.
+- Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
 - Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, and placement phases.
 - Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
 - Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
@@ -36,7 +37,7 @@ Last updated: 2026-11-23
 
 ## Next up
 
-1. Test persistent timeline and multi-round flow locally (`npm run build`).
+1. Test multi-round timeline and token actions locally (`npm run build`).
 2. Replace `YouTubePlayer.tsx` with the improved implementation.
 2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
 3. Verify playback behavior when changing songs.
@@ -66,7 +67,7 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.5 — Persistent timeline and multi-round gameplay
+Milestone 2.6 — Token actions and rule alignment
 
 Status: Implemented in GitHub; local build/test not run.
 
@@ -76,4 +77,4 @@ Files:
 
 ## Next milestone
 
-Milestone 2.6 — Token actions and rule alignment
+Milestone 2.7 — Steal mechanics and win condition
