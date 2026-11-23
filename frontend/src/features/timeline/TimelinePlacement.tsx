@@ -178,7 +178,7 @@ export default function TimelinePlacement({
       return;
     }
     if (result === "correct") {
-      onNextRound({ ownerIndex: currentPlayerIndex, timeline });
+      onNextRound({ ownerIndex: currentPlayerIndex, timeline: initialTimeline.length === 0 ? [drawnSong] : timeline });
       return;
     }
     onNextRound();
