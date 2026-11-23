@@ -127,7 +127,7 @@ export default function TimelinePlacement({
   function resolveSteal() {
     if (stealSlot === null || lockedSlot === null) return;
     const originalCorrect = isCorrectPlacement(drawnSong, timeline, lockedSlot);
-    const stealCorrect = isCorrectPlacement(drawnSong, timeline, stealSlot);
+    const stealCorrect = !originalCorrect && isCorrectPlacement(drawnSong, timeline, stealSlot);
     setStealResult(stealCorrect);
     setRevealed(true);
     setResult(originalCorrect ? "correct" : "incorrect");
