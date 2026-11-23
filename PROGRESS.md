@@ -1,113 +1,90 @@
-
 # TimeTune — Progress
 
 Last updated: 2026-11-24
 
 ## Done
 
-- Game frontend foundation — `frontend/` — React 19, TypeScript, Vite, and Tailwind CSS v4.
+### Frontend
+- Game frontend foundation — `frontend/` — React 19, TypeScript, Vite, Tailwind CSS v4.
 - Visual design system — `frontend/src/index.css` — dark editorial music aesthetic with red/orange and lime accents, Space Grotesk and DM Mono.
-- Vinyl record visual — `frontend/src/App.tsx` — animated record and label.
-- Tonearm visual — `frontend/src/App.tsx` — SVG tonearm with playback states.
-- Countdown phase — `frontend/src/App.tsx` — countdown before listening begins.
-- Listening phase — `frontend/src/App.tsx` — music playback and waveform progress.
-- Guessing phase — `frontend/src/App.tsx` — song title and artist inputs.
-- Reveal phase — `frontend/src/App.tsx` — displays song details and guess result.
-- Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface, chronological timeline, and timeline carry-forward between rounds.
-- Placement lock and steal window — `frontend/src/features/timeline/TimelinePlacement.tsx` — local player locks their slot before the steal window; opponents can rebattle on their own timelines, with ownership transfer and chip cost resolved.
-- Multi-round gameplay state — `frontend/src/App.tsx` — tracks round number, used songs, official timeline, and draws the next unused configured song after placement.
-- Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
-- Ten-card win condition — `frontend/src/App.tsx` — correct placements and direct claims trigger a victory screen when the official timeline reaches 10 cards.
-- Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, placement, and victory phases.
-- Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
-- Token chip UI — `frontend/src/App.tsx`, `frontend/src/index.css` — clickable chip balance opens a power-up menu; color changes by balance (red at 0, ivory at 1, black/gold at 2, gold at 3+). Skip (1) and Direct Claim (3) are available there.
-- Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
-- Song type — `frontend/src/types/song.ts` — shared song data interface.
-- Song selection — `frontend/src/utils/songUtils.ts` — random unused song selection.
-- YouTube IFrame API integration — `frontend/src/features/player/YouTubePlayer.tsx` — embedded playback and player controls.
-- YouTube player styling — `frontend/src/features/player/YouTubePlayer.css` — responsive embedded player.
-- YouTube IDs — `frontend/src/data/songs.json` — initial five songs configured with video IDs.
+- Vinyl record visual and tonearm.
+- Countdown, listening, guessing, reveal, timeline placement, and victory phases.
+- Multi-round gameplay state and unused-song selection.
+- Token actions: skip song for 1 token and direct chronological claim for 3 tokens.
+- Ten-card win condition.
+- Song dataset — initial 50-song frontend collection.
+- Local Mode frontend — lobby, editable names, rotating active-player indicator, player chip balances and timelines, steal picker, rebattle, successful ownership transfer, and pass-the-device handoff.
+- Local round-resolution synchronization — finalized round ownership/timeline is passed directly into round advancement to avoid stale React state; steal token cost is persisted; temporary reference cards are excluded from official outcomes.
+
+### Backend foundation — Milestone 4.0
+- Maven/Spring Boot 3.4.4 project scaffold under `backend/`, targeting Java 21.
+- OOP domain objects: `Song` record, encapsulated `Player`, `TokenBank`, `Timeline`, and `GameSession`.
+- Timeline validates chronological insertion and allows same-year placements; win threshold is 10 official cards.
+- TokenBank enforces the 5-token cap and prevents overspending.
+- Song catalog repository with five development seed songs.
+- GameSessionService creates local sessions, draws unused songs, and prepares audio through an abstraction.
+- Provider-neutral `AudioProvider` interface and `MockAudioProvider`; no external streaming integration.
+- REST endpoints: health, create local game, fetch metadata-free song prompt, and reveal metadata.
+- DTOs separate API payloads from domain models.
+- `CONTRACT.md` records endpoint shapes and known phase-validation limitations.
+- Initial domain tests added for timeline ordering/same-year behavior and token balance.
 
 ## In progress
 
-- Local Mode — lobby, rotating active-player indicator, per-player chip balances and timelines, steal picker, rebattle on the selected player's timeline, successful card ownership transfer, pass-the-device handoff screen, Current player and chip-less players cannot steal. The standings strip was removed from the gameplay header to keep the local interface focused.
-- Local round-resolution synchronization — fixed a stale React-state issue where the next-round callback could miss a card earned or transferred in the immediately preceding placement/steal. The resolved timeline is now passed directly into round advancement, and the steal chip cost is persisted for both successful and failed attempts. Temporary starting references are excluded from the official timeline outcome.
-
-- Player reliability — `frontend/src/features/player/YouTubePlayer.tsx`
-  - Shared YouTube API loader.
-  - API loading timeout and retry handling.
-  - Player lifecycle cleanup.
-  - Safe playback controls.
-  - Callback reference stability.
-  - Playback error handling.
+- Frontend Local Mode QA and edge-case verification. Build and browser testing have not been run in this environment.
+- Backend foundation is committed to GitHub but has not been compiled or executed. The initial catalogue is only five seed entries and is not yet synchronized with the 50-song frontend catalogue.
+- Backend session persistence, phase/turn validation, token actions, placement/steal rules, and frontend integration are not yet implemented.
 
 ## Next up
 
-1. Run frontend build and test local lobby, handoff, timeline, steal transfer, and individual victory flow.
-2. Audit state synchronization and rule edge cases (direct claim, steal-win, reference-card handling).
-3. Add local save/resume and clean game-exit/restart behavior.
-4. Replace `YouTubePlayer.tsx` with the improved implementation and test API loading, initialization, play, pause, replay, skip, and cleanup.
-3. Verify playback behavior when changing songs.
-4. Improve error messaging for unavailable or restricted videos.
-5. Configure YouTube video IDs for the remaining songs.
-6. Test the complete gameplay loop.
-7. Review guess matching and token rules against `GAME-DESIGN.md`.
-8. Implement the authoritative game rules in the backend.
-9. Build the typed API client and mock layer.
-10. Implement multiplayer rooms and server-authoritative turn handling.
-11. Implement the server-enforced steal window.
-12. Add reconnect and room-state recovery.
-13. Polish responsive layouts and accessibility.
+1. Verify backend build and tests using JDK 21 + Maven.
+2. Expand/import the existing frontend song catalogue into a backend catalogue with stable IDs and metadata.
+3. Add server-side game phase and turn state; gate reveal so metadata is unavailable before the reveal phase.
+4. Implement server-authoritative placement, token actions, steal arbitration, and victory.
+5. Define WebSocket contract for multiplayer only after REST/domain rules stabilize.
+6. Add persistence and session recovery.
+7. Create typed frontend API client and mock implementation using the same interface.
+8. Connect Local Mode frontend to backend while preserving existing UI.
+9. Continue frontend QA, responsive/accessibility review, and gameplay edge-case testing.
 
 ## Decisions / notes
 
+- OOP is a core project requirement and learning objective. Favor encapsulated domain models, focused services, composition, interfaces, and polymorphism; avoid a monolithic GameManager.
 - Preserve the existing TimeTune visual design.
-- The player interface must remain independent of the game rules.
-- The YouTube IFrame API is the current permitted audio implementation.
-- Audio is embedded from YouTube and is not hosted by TimeTune.
-- Song metadata remains in the song dataset.
-- Playback errors must not crash the game.
-- Spotify playback integration is not part of this implementation.
-- Do not expose song title, artist, or year before the reveal phase in multiplayer.
-- Follow `GAME-DESIGN.md` as the authoritative gameplay reference.
-- Follow `MASTER-PROMPT.md` for technical conventions and delivery requirements.
+- Game rules must remain independent of the audio provider.
+- Intended product UX is audio-only during guessing: no title, artist, year, music video, album art, or artist imagery until reveal.
+- Spotify was discussed as a desired music source, but Spotify platform use is restricted for music-guessing games. Do not implement Spotify SDK/API playback or workarounds. Use provider-neutral interfaces and mock audio for development.
+- The current frontend still contains historical YouTube playback code; backend work must not treat that as the committed long-term audio architecture.
+- No audio provider integration is confirmed. Playback errors must not crash the game.
+- Do not expose song title, artist, or year before the reveal phase; backend prompt DTO intentionally contains only song ID and mock audio status.
+- Follow `GAME-DESIGN.md` as gameplay source of truth and `MASTER-PROMPT.md` for technical conventions.
 
 ## Current milestone
+
+Milestone 4.0 — OOP backend foundation
+
+Status: Implemented in GitHub; compile/test not run.
+
+Files:
+- `CONTRACT.md` — initial REST API contract.
+- `backend/pom.xml`, `backend/README.md` — Maven/Spring Boot project.
+- `backend/src/main/java/com/timetune/domain/` — Song, Player, TokenBank, Timeline, GameSession.
+- `backend/src/main/java/com/timetune/service/GameSessionService.java` — session creation and unused-song selection.
+- `backend/src/main/java/com/timetune/repository/SongCatalog.java` — development seed catalogue.
+- `backend/src/main/java/com/timetune/audio/` — provider interface and mock provider.
+- `backend/src/main/java/com/timetune/api/` — health and local-game/prompt/reveal endpoints plus DTOs.
+- `backend/src/test/java/com/timetune/domain/TimelineTest.java` — initial domain tests.
+
+Limitations: no persistence, reveal phase gating, token action endpoints, placement resolution, steal arbitration, WebSocket multiplayer, frontend integration, or real audio playback yet. The prompt endpoint is metadata-free, but reveal is currently callable at any time; phase authorization is a next milestone.
+
+## Previous milestone
 
 Milestone 3.1 — Local round resolution synchronization
 
 Status: Implemented in GitHub; local build/test not run.
 
-Files:
-- `frontend/src/features/timeline/TimelinePlacement.tsx` — passes the finalized round ownership/timeline into round advancement so React state batching cannot drop a just-earned or stolen card.
-- `frontend/src/App.tsx` — round advancement now resolves card ownership and the steal-chip deduction from the placement outcome before checking the 10-card win condition.
+- `frontend/src/features/timeline/TimelinePlacement.tsx` passes finalized round ownership/timeline into round advancement.
+- `frontend/src/App.tsx` resolves card ownership and steal-chip deduction before win checks.
 
-Remaining verification: run build/tests and manually check handoff privacy, direct claim score sync, chip sync, empty timeline rebattle, and a steal that puts a player at 10 cards. Local-only implementation; online multiplayer requires backend/server authority.
+Remaining verification: run build/tests and manually check handoff privacy, direct claim score sync, chip sync, empty timeline rebattle, and steal-to-win.
 
-## Previous milestone
-
-Milestone 2.7b — Placement lock and steal-window simulation
-
-Status: Implemented in GitHub; local build/test not run.
-
-Files:
-- `frontend/src/features/timeline/TimelinePlacement.tsx` — placement is locked first; a steal window appears before reveal. The user can pass or spend one token to simulate a steal and choose a rebattle slot. Song reveal happens after the decision. A correctly placed original card is protected from stealing.
-- `frontend/src/App.tsx` — connects simulated steal token cost to the token balance.
-- `frontend/src/features/timeline/TimelinePlacement.css` — styles steal-window controls.
-
-Limitation: This is a single-player simulation only. It does not model first-commit arbitration, a separate opponent timeline, or transfer ownership. Those require player state/multiplayer.
-
-## Previous milestone
-
-Milestone 2.7 — Win condition
-
-Status: Implemented in GitHub; local build/test not run.
-
-Files:
-- `frontend/src/App.tsx` — checks official timeline count after correct placements and direct claims; switches to a victory phase at 10 official cards and shows a victory screen with restart action. Temporary reference card is excluded because it is not stored in the official timeline.
-
-Note: Steal mechanics are deferred until player/opponent state and multiplayer turn flow exist. The current single-player prototype cannot accurately simulate the confirmed first-commit, token-cost, and card-transfer rules.
-
-## Next milestone
-
-Milestone 3.2 — Local Mode QA, save/resume, and remaining edge-case fixes
