@@ -231,6 +231,7 @@ export default function App() {
   );
   const playerControlsRef = useRef<YouTubePlayerControls | null>(null);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
+  const [powerUpsOpen, setPowerUpsOpen] = useState(false);
 
   useEffect(() => {
     if (state.phase !== "countdown") return;
@@ -289,11 +290,15 @@ export default function App() {
           ROUND {String(state.round).padStart(2, "0")}
         </div>
 
-        <div className="token-counter" aria-label={`${state.tokens} tokens`}>
-          <span className="token-symbol">✦</span>
-          <strong>{state.tokens}</strong>
-          <span className="token-label">TOKENS</span>
-        </div>
+        <button className={`token-counter chip-level-${state.tokens}`} aria-label={`Open power-ups. ${state.tokens} tokens`} aria-expanded={powerUpsOpen} onClick={() => setPowerUpsOpen((open) => !open)}>
+          <span className="token-chip" aria-hidden="true"><span className="chip-inner">{state.tokens}</span></span><strong>{state.tokens}</strong><span className="token-label">POWER-UPS</span>
+        </button>
+        {powerUpsOpen && <div className="power-up-menu" role="dialog" aria-label="Token power-ups">
+          <div className="power-up-heading"><span>POWER-UPS</span><button className="power-up-close" onClick={() => setPowerUpsOpen(false)} aria-label="Close">×</button></div><p className="power-up-subtitle">Spend your chips to change the turn.</p>
+          <button className="power-up-action" disabled={state.tokens < 1 || !["listening","guessing"].includes(state.phase)} onClick={() => {playerControlsRef.current?.stop();const nextSong=getRandomUnusedSong(SONGS,state.usedSongIds);if(!nextSong)return;dispatch({type:"SKIP_SONG",state:{...state,phase:"countdown",countdown:3,seconds:0,duration:0,playing:false,titleGuess:"",artistGuess:"",correct:null,tokens:state.tokens-1,drawnSong:nextSong,usedSongIds:[...state.usedSongIds,nextSong.id],round:state.round+1}});setPowerUpsOpen(false);}}>
+            <span className="power-up-name"><span className="action-mark">↻</span><span><strong>Skip song</strong><small>Draw a new track</small></span></span><span className="action-cost">1 CHIP</span></button>
+          <button className="power-up-action" disabled={state.tokens < 3 || !["listening","guessing"].includes(state.phase)} onClick={() => {playerControlsRef.current?.stop();const nextSong=getRandomUnusedSong(SONGS,state.usedSongIds);if(!nextSong)return;const nextTimeline=[...state.timeline];nextTimeline.splice(getCorrectInsertionIndex(state.drawnSong,nextTimeline),0,state.drawnSong);dispatch({type:"DIRECT_CLAIM",state:{...state,phase:"countdown",countdown:3,seconds:0,duration:0,playing:false,titleGuess:"",artistGuess:"",correct:null,tokens:state.tokens-3,timeline:nextTimeline,drawnSong:nextSong,usedSongIds:[...state.usedSongIds,nextSong.id],round:state.round+1}});setPowerUpsOpen(false);}}>
+            <span className="power-up-name"><span className="action-mark">✦</span><span><strong>Direct claim</strong><small>Claim without placement risk</small></span></span><span className="action-cost">3 CHIPS</span></button><div className="power-up-footer">NAME BOTH TITLE + ARTIST TO EARN A CHIP</div></div>
       </header>
 
       {state.phase === "countdown" && (
@@ -599,36 +604,7 @@ export default function App() {
                   gap: "8px",
                 }}
               >
-                <button
-                  className="text-control"
-                  onClick={() => {
-                    playerControlsRef.current?.stop();
-                    const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
-                    if (state.tokens < 1 || !nextSong) return;
-                    dispatch({
-                      type: "SKIP_SONG",
-                      state: {
-                        ...state,
-                        phase: "countdown",
-                        countdown: 3,
-                        seconds: 0,
-                        duration: 0,
-                        playing: false,
-                        titleGuess: "",
-                        artistGuess: "",
-                        correct: null,
-                        tokens: state.tokens - 1,
-                        drawnSong: nextSong,
-                        usedSongIds: [...state.usedSongIds, nextSong.id],
-                        round: state.round + 1,
-                      },
-                    });
-                  }}
-                disabled={state.tokens < 1}
-                title="Spend 1 token to skip this song"
-                >
-                  Skip song · 1 token <span>↗</span>
-                </button>
+
 
                 <button
                   className="text-control"
@@ -780,41 +756,7 @@ export default function App() {
             >
               Place on timeline <span>↗</span>
             </button>
-            <button
-              className="text-control direct-claim"
-              disabled={state.tokens < 3}
-              onClick={() => {
-                const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
-                const nextTimeline = [...state.timeline];
-                const insertionIndex = getCorrectInsertionIndex(state.drawnSong, nextTimeline);
-                nextTimeline.splice(insertionIndex, 0, state.drawnSong);
-                if (!nextSong) {
-                  restartGame();
-                  return;
-                }
-                dispatch({
-                  type: "DIRECT_CLAIM",
-                  state: {
-                    ...state,
-                    phase: "countdown",
-                    countdown: 3,
-                    seconds: 0,
-                    duration: 0,
-                    playing: false,
-                    titleGuess: "",
-                    artistGuess: "",
-                    correct: null,
-                    tokens: state.tokens - 3,
-                    timeline: nextTimeline,
-                    drawnSong: nextSong,
-                    usedSongIds: [...state.usedSongIds, nextSong.id],
-                    round: state.round + 1,
-                  },
-                });
-              }}
-            >
-              Claim song · 3 tokens <span>✦</span>
-            </button>
+
           </div>
         </section>
       )}
