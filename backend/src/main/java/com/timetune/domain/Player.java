@@ -4,23 +4,22 @@ import java.util.Objects;
 import java.util.UUID;
 
 public final class Player {
-    private final String id;
-    private final String name;
-    private final TokenBank tokenBank;
+    private final UUID id;
+    private final String displayName;
     private final Timeline timeline;
-
-    public Player(String name) {
-        this(UUID.randomUUID().toString(), name, new TokenBank(1), new Timeline());
+    private final TokenBank tokenBank;
+    public Player(UUID id, String displayName, Song temporaryReference) {
+        this.id = Objects.requireNonNull(id, "id");
+        if (displayName == null || displayName.isBlank()) throw new IllegalArgumentException("displayName cannot be blank");
+        this.displayName = displayName.trim();
+        timeline = new Timeline(temporaryReference);
+        tokenBank = new TokenBank();
     }
-    public Player(String id, String name, TokenBank tokenBank, Timeline timeline) {
-        this.id = Objects.requireNonNull(id);
-        this.name = Objects.requireNonNull(name).trim();
-        if (this.name.isBlank()) throw new IllegalArgumentException("Player name must not be blank");
-        this.tokenBank = Objects.requireNonNull(tokenBank);
-        this.timeline = Objects.requireNonNull(timeline);
+    public static Player create(String displayName, Song temporaryReference) {
+        return new Player(UUID.randomUUID(), displayName, temporaryReference);
     }
-    public String id() { return id; }
-    public String name() { return name; }
-    public TokenBank tokenBank() { return tokenBank; }
-    public Timeline timeline() { return timeline; }
+    public UUID getId() { return id; }
+    public String getDisplayName() { return displayName; }
+    public Timeline getTimeline() { return timeline; }
+    public TokenBank getTokenBank() { return tokenBank; }
 }

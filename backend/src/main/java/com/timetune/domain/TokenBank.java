@@ -1,23 +1,23 @@
 package com.timetune.domain;
 
+/** Encapsulates token economy invariants. */
 public final class TokenBank {
+    public static final int DEFAULT_STARTING_TOKENS = 1;
     public static final int MAX_TOKENS = 5;
     private int balance;
-
+    public TokenBank() { this(DEFAULT_STARTING_TOKENS); }
     public TokenBank(int startingBalance) {
-        if (startingBalance < 0 || startingBalance > MAX_TOKENS) throw new IllegalArgumentException("Token balance out of range");
+        if (startingBalance < 0 || startingBalance > MAX_TOKENS) throw new IllegalArgumentException("Invalid starting balance");
         balance = startingBalance;
     }
-
-    public int balance() { return balance; }
-    public boolean spend(int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Spend amount must be positive");
-        if (balance < amount) return false;
+    public int getBalance() { return balance; }
+    public boolean canSpend(int amount) { return amount > 0 && balance >= amount; }
+    public void spend(int amount) {
+        if (!canSpend(amount)) throw new IllegalStateException("Insufficient tokens");
         balance -= amount;
-        return true;
     }
     public void earn(int amount) {
-        if (amount <= 0) throw new IllegalArgumentException("Earn amount must be positive");
+        if (amount < 0) throw new IllegalArgumentException("Cannot earn a negative amount");
         balance = Math.min(MAX_TOKENS, balance + amount);
     }
 }

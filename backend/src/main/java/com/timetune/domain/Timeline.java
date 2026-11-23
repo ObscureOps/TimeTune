@@ -4,22 +4,40 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/** Owns chronological official cards and the temporary first-placement reference. */
 public final class Timeline {
     private final List<Song> officialCards = new ArrayList<>();
+    private Song temporaryReference;
+    public Timeline(Song temporaryReference) { this.temporaryReference = temporaryReference; }
+    public List<Song> getOfficialCards() { return Collections.unmodifiableList(officialCards); }
+    public Song getTemporaryReference() { return temporaryReference; }
+    public int getOfficialCardCount() { return officialCards.size(); }
+    public boolean hasWon() { return officialCards.size() >= 10; }
 
-    public List<Song> cards() { return Collections.unmodifiableList(officialCards); }
-    public int size() { return officialCards.size(); }
-    public boolean hasWon() { return size() >= 10; }
-    public boolean canInsertAt(int index, Song song) {
-        if (song == null || index < 0 || index > officialCards.size()) return false;
-        boolean afterPrevious = index == 0 || officialCards.get(index - 1).year() <= song.year();
-        boolean beforeNext = index == officialCards.size() || song.year() <= officialCards.get(index).year();
-        return afterPrevious && beforeNext;
+    /** Index is 0..official-card-count; when empty, 0 means before reference and 1 after it. */
+    public boolean isPlacementCorrect(Song candidate, int insertionIndex) {
+        if (officialCards.isEmpty() && temporaryReference != null) {
+            if (insertionIndex < 0 || insertionIndex > 1) return false;
+            return insertionIndex == 0
+                ? candidate.getReleaseYear() <= temporaryReference.getReleaseYear()
+                : candidate.getReleaseYear() >= temporaryReference.getReleaseYear();
+        }
+        if (insertionIndex < 0 || insertionIndex > officialCards.size()) return false;
+        Song previous = insertionIndex > 0 ? officialCards.get(insertionIndex - 1) : null;
+        Song next = insertionIndex < officialCards.size() ? officialCards.get(insertionIndex) : null;
+        return (previous == null || previous.getReleaseYear() <= candidate.getReleaseYear())
+            && (next == null || candidate.getReleaseYear() <= next.getReleaseYear());
     }
-    public boolean insert(int index, Song song) {
-        if (!canInsertAt(index, song)) return false;
+    public void addOfficialCard(Song song, int insertionIndex) {
+        if (!isPlacementCorrect(song, insertionIndex)) throw new IllegalArgumentException("Invalid chronological placement");
+        int safeIndex = Math.min(insertionIndex, officialCards.size());
+        officialCards.add(safeIndex, song);
+        temporaryReference = null;
+    }
+    public void transferCardIn(Song song) {
+        int index = 0;
+        while (index < officialCards.size() && officialCards.get(index).getReleaseYear() <= song.getReleaseYear()) index++;
         officialCards.add(index, song);
-        return true;
+        temporaryReference = null;
     }
-    public boolean remove(Song song) { return officialCards.remove(song); }
 }

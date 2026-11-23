@@ -1,35 +1,16 @@
 # TimeTune API Contract
 
-Version: 0.1.0 (backend foundation)
+## Status
+No API endpoints or WebSocket event shapes are finalized yet. This document must be updated before either frontend or backend depends on new transport contracts.
 
-## Principles
-- Backend is authoritative for song selection and metadata reveal.
-- Prompt responses never include title, artist, year, genre, or artwork.
-- Domain objects encapsulate state; controllers only translate HTTP requests/responses.
-- Audio is provider-neutral. Development uses a mock provider; no streaming-provider integration is implemented.
+## Planned REST surface (not implemented)
+- `POST /api/games` — create a game session.
+- `POST /api/games/{gameId}/players` — add a player to a waiting session.
+- `POST /api/games/{gameId}/start` — start a session.
+- `GET /api/games/{gameId}` — retrieve current game state with phase-safe song metadata.
 
-## REST
+## Planned real-time surface (not implemented)
+WebSocket/STOMP vs raw WebSocket remains undecided. Planned event categories: player joined/ready, game started, turn changed, placement committed, steal window opened/closed, reveal, tokens updated, game finished.
 
-### GET /api/health
-Response: `{ "status": "UP" }`
-
-### POST /api/games/local
-Request: `{ "playerNames": ["Player 1", "Player 2"] }`
-Response: `{ "gameId": "...", "players": [{ "id": "...", "name": "...", "tokens": 1, "officialCards": 0 }] }`
-Creates a local session and draws its first song.
-
-### GET /api/games/{gameId}/prompt
-Response: `{ "songId": "...", "audioStatus": "MOCK_READY" }`
-Must not expose identifying song metadata.
-
-### POST /api/games/{gameId}/reveal
-Response: `{ "songId": "...", "title": "...", "artist": "...", "year": 2000, "genre": "..." }`
-Returns metadata for the current song. Reveal phase authorization/state gating is not implemented in this foundation milestone and must be added before gameplay integration.
-
-## WebSocket
-Not defined yet. Do not implement multiplayer messages until their payloads and authority rules are added here.
-
-## Known foundation limitations
-- The initial backend catalogue is a small development seed; it is not yet synchronized with the frontend dataset.
-- Session persistence, turn progression, token actions, timeline placement, steal resolution, and phase validation are not implemented yet.
-- Audio playback is mocked only.
+## Security/data boundary
+Song title, artist, and release year must not be sent to clients before the reveal phase. Audio integration is provider-neutral and mock-based during development.
