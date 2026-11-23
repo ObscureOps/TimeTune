@@ -700,6 +700,17 @@ export default function App() {
               >
                 Lock it in <span>↗</span>
               </button>
+
+              <button
+                className="text-control skip-guess-control"
+                type="button"
+                onClick={() => {
+                  playerControlsRef.current?.pause();
+                  dispatch({ type: "CONTINUE" });
+                }}
+              >
+                Skip guess <span>→</span>
+              </button>
             </form>
           )}
         </section>
