@@ -825,10 +825,14 @@ export default function App() {
               restartGame();
               return;
             }
-            setLocalTokenBalances((balances) => balances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance));
-            setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? state.timeline : timeline));
-            if (state.timeline.length >= 10) {
-              dispatch({ type: "NEXT_ROUND", state: { ...state, phase: "won" } });
+            const savedBalances = localTokenBalances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance);
+            const savedTimelines = localTimelines.map((timeline, index) => index === localPlayerIndex ? state.timeline : timeline);
+            setLocalTokenBalances(savedBalances);
+            setLocalTimelines(savedTimelines);
+            const winnerIndex = savedTimelines.findIndex((timeline) => timeline.length >= 10);
+            if (winnerIndex >= 0) {
+              setLocalPlayerIndex(winnerIndex);
+              dispatch({ type: "NEXT_ROUND", state: { ...state, tokens: savedBalances[winnerIndex] ?? 0, timeline: savedTimelines[winnerIndex], phase: "won" } });
               return;
             }
             const nextPlayerIndex = (localPlayerIndex + 1) % localPlayers.length;
