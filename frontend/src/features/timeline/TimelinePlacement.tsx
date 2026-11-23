@@ -138,7 +138,6 @@ export default function TimelinePlacement({
   function beginSteal(playerIndex: number) {
     if (lockedSlot === null || playerIndex === currentPlayerIndex) return;
     if ((playerTokens[playerIndex] ?? 0) < 1) return;
-    onStealSelected(playerIndex);
     setSelectedStealer(playerIndex);
     setStealMode(true);
     setStealSlot(null);
