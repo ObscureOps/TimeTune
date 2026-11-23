@@ -69,7 +69,7 @@ export default function TimelinePlacement({
   function handleDragStart(
     event: React.DragEvent<HTMLDivElement>,
   ) {
-    if (revealed || lockedSlot !== null) {
+    if (revealed || (lockedSlot !== null && !stealMode)) {
       event.preventDefault();
       return;
     }
@@ -84,7 +84,7 @@ export default function TimelinePlacement({
     event: React.DragEvent<HTMLButtonElement>,
     slotIndex: number,
   ) {
-    if (revealed) return;
+    if (revealed || (stealMode && slotIndex === lockedSlot)) return;
 
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
@@ -98,13 +98,14 @@ export default function TimelinePlacement({
   ) {
     event.preventDefault();
 
-    if (revealed) return;
+    if (revealed || (stealMode && slotIndex === lockedSlot)) return;
 
     const draggedCard = event.dataTransfer.getData("text/plain");
 
     if (draggedCard !== drawnSong.id) return;
 
-    setSelectedSlot(slotIndex);
+    if (stealMode) setStealSlot(slotIndex);
+    else setSelectedSlot(slotIndex);
     setDragOverSlot(null);
   }
 
@@ -247,8 +248,9 @@ export default function TimelinePlacement({
 
         <div className="timeline-cards">
           {Array.from({ length: slots }, (_, slotIndex) => {
-            const isSelected = selectedSlot === slotIndex;
+            const isSelected = stealMode ? stealSlot === slotIndex : selectedSlot === slotIndex;
             const isDragOver = dragOverSlot === slotIndex;
+            const isLockedByOriginal = stealMode && slotIndex === lockedSlot;
 
             return (
               <div
@@ -277,7 +279,7 @@ export default function TimelinePlacement({
                   onDrop={(event) =>
                     handleDrop(event, slotIndex)
                   }
-                  disabled={revealed || (lockedSlot !== null && !stealMode)}
+                  disabled={revealed || (lockedSlot !== null && !stealMode) || isLockedByOriginal}
                   aria-label={`Place song at position ${
                     slotIndex + 1
                   }`}
@@ -309,7 +311,7 @@ export default function TimelinePlacement({
           <span className="instruction-line" />
 
           <span>
-            {revealed ? "CARD REVEALED" : stealMode ? "STEAL COMMITTED · CHOOSE REBATTLE SLOT" : lockedSlot !== null ? "PLACEMENT LOCKED · STEAL WINDOW" : "DRAG THE MYSTERY CARD INTO YOUR TIMELINE"}
+            {revealed ? "CARD REVEALED" : stealMode ? "STEAL COMMITTED · DRAG TO A DIFFERENT SLOT" : lockedSlot !== null ? "PLACEMENT LOCKED · STEAL WINDOW" : "DRAG THE MYSTERY CARD INTO YOUR TIMELINE"}
           </span>
 
           <span className="instruction-line" />
@@ -323,7 +325,7 @@ export default function TimelinePlacement({
               ? "card-selected"
               : ""
           }`}
-          draggable={!revealed && lockedSlot === null && !stealMode}
+          draggable={!revealed && (lockedSlot === null || stealMode)}
           onDragStart={handleDragStart}
           onDragEnd={() => setDragOverSlot(null)}
           role="group"
@@ -398,7 +400,7 @@ export default function TimelinePlacement({
       ) : !revealed && !stealMode ? (
         <div className="timeline-feedback steal-window">
           <div className="feedback-heading"><span className="feedback-icon">!</span><div><strong>Steal window open</strong><span>Players decide their own house rules. Choose who agreed to steal.</span></div></div>
-          <div className="local-steal-player-list">
+          <div className="local-steal-player-list" role="list">
             {localPlayers.map((player, index) => {
               const balance = playerTokens[index] ?? 0;
               const isCurrent = index === currentPlayerIndex;
@@ -413,17 +415,17 @@ export default function TimelinePlacement({
         </div>
       ) : !revealed && stealMode ? (
         <div className="timeline-actions">
-          <p className="timeline-action-hint">The selected player committed to stealing. Choose a rebattle position.</p>
-          <button className="timeline-primary" disabled={stealSlot === null} onClick={resolveSteal}>Lock rebattle <span>↗</span></button>
+          <p className="timeline-action-hint">Drag the mystery card to a different slot. The original player’s locked slot is unavailable.</p>
+          <button className="timeline-primary" disabled={stealSlot === null || stealSlot === lockedSlot} onClick={resolveSteal}>Lock rebattle <span>↗</span></button>
           <button className="timeline-secondary" onClick={() => {setStealMode(false);setStealSlot(null);}}>Cancel simulation</button>
         </div>
       ) : (
-        <div className={`timeline-feedback ${result}`}>
+        <div className={`timeline-feedback ${stealResult === true ? "steal-success" : stealResult === false ? "steal-failure" : result}`}>
           <div className="feedback-heading">
-            <span className="feedback-icon">{result === "correct" ? "✓" : "×"}</span>
+            <span className="feedback-icon">{stealResult === true ? "🏆" : stealResult === false ? "×" : result === "correct" ? "✓" : "×"}</span>
             <div>
-              <strong>{stealResult !== null ? (stealResult ? "STEAL SUCCESSFUL" : "STEAL FAILED") : result === "correct" ? "Correct placement!" : "Not quite right."}</strong>
-              <span>{stealResult !== null ? (stealResult ? "The selected player placed the card correctly and wins it." : "The selected player placed it incorrectly. The card is discarded.") : result === "correct" ? "The card has been added to your timeline." : "The card was discarded. The timeline stays unchanged."}</span>
+              <strong className="steal-result-title">{stealResult !== null ? (stealResult ? "STEAL SUCCESSFUL — CARD WON!" : "STEAL FAILED — CARD DISCARDED") : result === "correct" ? "CORRECT PLACEMENT — CARD SECURED" : "INCORRECT PLACEMENT — CARD DISCARDED"}</strong>
+              <span>{stealResult !== null ? (stealResult ? "The original placement was wrong, but the stealer placed it correctly. The card transfers to the stealer." : result === "correct" ? "The original player was correct. Their card stays; the steal attempt fails." : "Both placements were wrong. Nobody receives the card; it is discarded. The stealer still spent 1 token.") : result === "correct" ? "The card has been added to the active player’s timeline." : "The active player was wrong. No card is awarded and it is discarded."}</span>
             </div>
           </div>
           <button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button>
