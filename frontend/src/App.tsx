@@ -71,7 +71,7 @@ function createInitialState(): GameState {
     titleGuess: "",
     artistGuess: "",
     correct: null,
-    tokens: 2,
+    tokens: 1,
     startingSong,
     drawnSong,
   };
