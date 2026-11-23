@@ -266,7 +266,7 @@ export default function TimelinePlacement({
                     isSelected ? "selected" : ""
                   } ${
                     isDragOver ? "drag-over" : ""
-                  } ${revealed ? "locked" : ""}`}
+                  } ${revealed ? "locked" : ""} ${isLockedByOriginal ? "locked-by-original" : ""}`}
                   onClick={() => stealMode ? setStealSlot(slotIndex) : selectSlot(slotIndex)}
                   onDragOver={(event) =>
                     handleDragOver(event, slotIndex)
@@ -285,7 +285,7 @@ export default function TimelinePlacement({
                   }`}
                 >
                   <span className="slot-plus">
-                    {isSelected || isDragOver ? "↓" : "+"}
+                    {isLockedByOriginal ? "×" : isSelected || isDragOver ? "↓" : "+"}
                   </span>
 
                   <span className="slot-label">
