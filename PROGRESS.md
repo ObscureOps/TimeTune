@@ -16,7 +16,8 @@ Last updated: 2026-11-23
 - Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface, chronological timeline, and timeline carry-forward between rounds.
 - Multi-round gameplay state — `frontend/src/App.tsx` — tracks round number, used songs, official timeline, and draws the next unused configured song after placement.
 - Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
-- Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, and placement phases.
+- Ten-card win condition — `frontend/src/App.tsx` — correct placements and direct claims trigger a victory screen when the official timeline reaches 10 cards.
+- Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, placement, and victory phases.
 - Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
 - Token chip UI — `frontend/src/App.tsx`, `frontend/src/index.css` — clickable chip balance opens a power-up menu; color changes by balance (red at 0, ivory at 1, black/gold at 2, gold at 3+). Skip (1) and Direct Claim (3) are available there.
 - Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
@@ -68,14 +69,15 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.6 — Token actions and UI refinement
+Milestone 2.7 — Win condition
 
 Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/App.tsx` — stores official timeline, round count, and used song IDs; draws the next unused configured song and resets listening phases. Implements chip power-up menu, skip (1 token), and direct claim (3 tokens), with correct chronological insertion for direct claims.
-- `frontend/src/features/timeline/TimelinePlacement.tsx` — accepts carried timeline state and reports successful placements to the game state. The initial reference song is used only for the first placement and is not carried into the official timeline.
+- `frontend/src/App.tsx` — checks official timeline count after correct placements and direct claims; switches to a victory phase at 10 official cards and shows a victory screen with restart action. Temporary reference card is excluded because it is not stored in the official timeline.
+
+Note: Steal mechanics are deferred until player/opponent state and multiplayer turn flow exist. The current single-player prototype cannot accurately simulate the confirmed first-commit, token-cost, and card-transfer rules.
 
 ## Next milestone
 
-Milestone 2.7 — Steal mechanics and win condition
+Milestone 2.7b — Steal mechanics foundation
