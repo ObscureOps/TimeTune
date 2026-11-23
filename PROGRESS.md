@@ -18,6 +18,7 @@ Last updated: 2026-11-23
 - Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
 - Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, and placement phases.
 - Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
+- Token actions — `frontend/src/App.tsx` — skipping costs 1 token; direct claim costs 3 and adds the card in chronological order without placement risk. Token spending is disabled when insufficient tokens.
 - Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
 - Song type — `frontend/src/types/song.ts` — shared song data interface.
 - Song selection — `frontend/src/utils/songUtils.ts` — random unused song selection.
@@ -72,7 +73,7 @@ Milestone 2.6 — Token actions and rule alignment
 Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/App.tsx` — stores official timeline, round count, and used song IDs; draws the next unused configured song and resets the listening phases.
+- `frontend/src/App.tsx` — stores official timeline, round count, and used song IDs; draws the next unused configured song and resets listening phases. Implements skip (1 token) and direct claim (3 tokens), with correct chronological insertion for direct claims.
 - `frontend/src/features/timeline/TimelinePlacement.tsx` — accepts carried timeline state and reports successful placements to the game state. The initial reference song is used only for the first placement and is not carried into the official timeline.
 
 ## Next milestone
