@@ -30,6 +30,9 @@ Last updated: 2026-11-23
 
 ## In progress
 
+- Local Mode setup — player lobby screen is being added; this is the first implementation step toward shared-device turn flow.
+
+
 - Player reliability — `frontend/src/features/player/YouTubePlayer.tsx`
   - Shared YouTube API loader.
   - API loading timeout and retry handling.
@@ -40,7 +43,8 @@ Last updated: 2026-11-23
 
 ## Next up
 
-1. Test token-chip menu, skip/direct claim, and multi-round timeline locally (`npm run build`).
+1. Implement Local Mode turn handoff and per-player timelines/token banks.
+2. Test local lobby and game flow (`npm run build`).
 2. Replace `YouTubePlayer.tsx` with the improved implementation.
 2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
 3. Verify playback behavior when changing songs.
@@ -69,6 +73,19 @@ Last updated: 2026-11-23
 - Follow `MASTER-PROMPT.md` for technical conventions and delivery requirements.
 
 ## Current milestone
+
+Milestone 2.8a — Local Mode lobby foundation
+
+Status: Lobby component added and integrated; local build/test not run.
+
+Files:
+- `frontend/src/features/local/LocalLobby.tsx` — configurable 2–8 player name setup and start action.
+- `frontend/src/features/local/LocalLobby.css` — responsive lobby styling.
+- `frontend/src/App.tsx` — app now enters through the Local Mode lobby.
+
+Next: implement active-player turn handoff, individual timelines and token banks, then local steal resolution.
+
+## Previous milestone
 
 Milestone 2.7b — Placement lock and steal-window simulation
 
