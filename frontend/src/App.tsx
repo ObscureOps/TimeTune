@@ -25,6 +25,9 @@ type GameState = {
   tokens: number;
   startingSong: Song;
   drawnSong: Song;
+  timeline: Song[];
+  usedSongIds: string[];
+  round: number;
 };
 
 type Action =
@@ -38,6 +41,8 @@ type Action =
   | { type: "SET_ARTIST"; value: string }
   | { type: "LOCK_GUESS" }
   | { type: "CONTINUE" }
+  | { type: "PLACEMENT_RESULT"; timeline: Song[] }
+  | { type: "NEXT_ROUND"; state: GameState }
   | { type: "RESET"; state: GameState };
 
 const SONGS = songs as Song[];
@@ -74,6 +79,9 @@ function createInitialState(): GameState {
     tokens: 1,
     startingSong,
     drawnSong,
+    timeline: [],
+    usedSongIds: [startingSong.id, drawnSong.id],
+    round: 1,
   };
 }
 
@@ -194,6 +202,12 @@ function reducer(state: GameState, action: Action): GameState {
         phase: "placement",
       };
 
+    case "PLACEMENT_RESULT":
+      return { ...state, timeline: action.timeline };
+
+    case "NEXT_ROUND":
+      return action.state;
+
     case "RESET":
       return action.state;
 
@@ -272,7 +286,7 @@ export default function App() {
 
         <div className="round-label">
           <span className="live-dot" />
-          ROUND 01
+          ROUND {String(state.round).padStart(2, "0")}
         </div>
 
         <div className="token-counter" aria-label={`${state.tokens} tokens`}>
@@ -749,8 +763,36 @@ export default function App() {
 
       {state.phase === "placement" && (
         <TimelinePlacement
+          key={state.round}
           startingSong={state.startingSong}
           drawnSong={state.drawnSong}
+          timeline={state.timeline}
+          round={state.round}
+          onPlacementResult={(nextTimeline) => dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline })}
+          onNextRound={() => {
+            const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
+            if (!nextSong) {
+              restartGame();
+              return;
+            }
+            dispatch({
+              type: "NEXT_ROUND",
+              state: {
+                ...state,
+                phase: "countdown",
+                countdown: 3,
+                seconds: 0,
+                duration: 0,
+                playing: false,
+                titleGuess: "",
+                artistGuess: "",
+                correct: null,
+                drawnSong: nextSong,
+                usedSongIds: [...state.usedSongIds, nextSong.id],
+                round: state.round + 1,
+              },
+            });
+          }}
           onRestart={restartGame}
         />
       )}
