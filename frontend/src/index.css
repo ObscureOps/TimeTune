@@ -756,3 +756,15 @@ button:disabled { opacity: .4; cursor: not-allowed; }
     transform: none;
   }
 }
+
+
+/* Local multiplayer handoff and standings */
+.local-scoreboard { display: flex; align-items: center; gap: 8px; overflow-x: auto; max-width: 44vw; scrollbar-width: none; }
+.local-scoreboard::-webkit-scrollbar { display: none; }
+.scoreboard-player { display: flex; flex-direction: column; gap: 3px; padding: 6px 9px; border: 1px solid #383838; border-radius: 6px; white-space: nowrap; color: var(--muted); }
+.scoreboard-player.active { border-color: var(--yellow); color: var(--paper); background: rgba(233,255,85,.06); }
+.scoreboard-player strong { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.scoreboard-player small { font: 9px var(--mono); }
+.handoff-stage h1 { max-width: 700px; margin: 0 auto; font-size: clamp(38px, 7vw, 76px); letter-spacing: -.06em; line-height: .98; }
+.handoff-stage .lock-button { margin-top: 24px; max-width: 340px; }
+@media (max-width: 620px) { .local-scoreboard { max-width: 46vw; gap: 5px; } .scoreboard-player { padding: 5px 7px; } .scoreboard-player strong { font-size: 9px; } .scoreboard-player small { font-size: 8px; } }
