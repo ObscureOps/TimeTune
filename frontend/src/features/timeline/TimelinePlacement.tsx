@@ -15,6 +15,10 @@ type Props = {
   onRestart: () => void;
   tokens: number;
   onSpendToken: () => void;
+  localPlayers: string[];
+  currentPlayerIndex: number;
+  playerTokens: number[];
+  onStealSelected: (playerIndex: number) => void;
 };
 
 export default function TimelinePlacement({
@@ -27,6 +31,10 @@ export default function TimelinePlacement({
   onRestart,
   tokens,
   onSpendToken,
+  localPlayers,
+  currentPlayerIndex,
+  playerTokens,
+  onStealSelected,
 }: Props) {
   const [timeline, setTimeline] = useState<Song[]>(
     initialTimeline.length > 0 ? initialTimeline : [startingSong],
@@ -47,6 +55,7 @@ export default function TimelinePlacement({
   const [stealMode, setStealMode] = useState(false);
   const [stealSlot, setStealSlot] = useState<number | null>(null);
   const [stealResult, setStealResult] = useState<boolean | null>(null);
+  const [selectedStealer, setSelectedStealer] = useState<number | null>(null);
 
   const slots = timeline.length + 1;
 
@@ -117,9 +126,11 @@ export default function TimelinePlacement({
     }
   }
 
-  function beginSimulatedSteal() {
-    if (tokens < 1 || lockedSlot === null) return;
-    onSpendToken();
+  function beginSteal(playerIndex: number) {
+    if (lockedSlot === null || playerIndex === currentPlayerIndex) return;
+    if ((playerTokens[playerIndex] ?? 0) < 1) return;
+    onStealSelected(playerIndex);
+    setSelectedStealer(playerIndex);
     setStealMode(true);
     setStealSlot(null);
   }
@@ -154,6 +165,7 @@ export default function TimelinePlacement({
     setStealMode(false);
     setStealSlot(null);
     setStealResult(null);
+    setSelectedStealer(null);
   }
 
   if (completed) {
@@ -297,7 +309,7 @@ export default function TimelinePlacement({
           <span className="instruction-line" />
 
           <span>
-            {revealed ? "CARD REVEALED" : stealMode ? "SIMULATED STEAL · CHOOSE REBATTLE SLOT" : lockedSlot !== null ? "PLACEMENT LOCKED · STEAL WINDOW" : "DRAG THE MYSTERY CARD INTO YOUR TIMELINE"}
+            {revealed ? "CARD REVEALED" : stealMode ? "STEAL COMMITTED · CHOOSE REBATTLE SLOT" : lockedSlot !== null ? "PLACEMENT LOCKED · STEAL WINDOW" : "DRAG THE MYSTERY CARD INTO YOUR TIMELINE"}
           </span>
 
           <span className="instruction-line" />
@@ -385,15 +397,23 @@ export default function TimelinePlacement({
         </div>
       ) : !revealed && !stealMode ? (
         <div className="timeline-feedback steal-window">
-          <div className="feedback-heading"><span className="feedback-icon">!</span><div><strong>Steal window open</strong><span>First commitment wins. This solo prototype simulates an opponent's rebattle.</span></div></div>
-          <div className="steal-actions">
-            <button className="timeline-primary" onClick={resolveWithoutSteal}>Pass · reveal <span>↗</span></button>
-            <button className="timeline-secondary steal-button" disabled={tokens < 1} onClick={beginSimulatedSteal}>Simulate steal · 1 chip</button>
+          <div className="feedback-heading"><span className="feedback-icon">!</span><div><strong>Steal window open</strong><span>Players decide their own house rules. Choose who agreed to steal.</span></div></div>
+          <div className="local-steal-player-list">
+            {localPlayers.map((player, index) => {
+              const balance = playerTokens[index] ?? 0;
+              const isCurrent = index === currentPlayerIndex;
+              const unavailable = isCurrent || balance < 1;
+              return <button key={index} className="local-steal-player" disabled={unavailable} onClick={() => beginSteal(index)}>
+                <span className="local-steal-player-copy"><strong>{player}</strong><small>{isCurrent ? "Current player · cannot steal own card" : balance + (balance === 1 ? " chip" : " chips")}</small></span>
+                <span className={"local-steal-status" + (unavailable ? " disabled" : "")}>{isCurrent ? "CURRENT" : balance < 1 ? "NO CHIPS" : "STEAL →"}</span>
+              </button>;
+            })}
           </div>
+          <button className="timeline-primary" onClick={resolveWithoutSteal}>No steal · reveal <span>↗</span></button>
         </div>
       ) : !revealed && stealMode ? (
         <div className="timeline-actions">
-          <p className="timeline-action-hint">Simulated opponent committed first. Choose a rebattle position.</p>
+          <p className="timeline-action-hint">The selected player committed to stealing. Choose a rebattle position.</p>
           <button className="timeline-primary" disabled={stealSlot === null} onClick={resolveSteal}>Lock rebattle <span>↗</span></button>
           <button className="timeline-secondary" onClick={() => {setStealMode(false);setStealSlot(null);}}>Cancel simulation</button>
         </div>
@@ -402,8 +422,8 @@ export default function TimelinePlacement({
           <div className="feedback-heading">
             <span className="feedback-icon">{result === "correct" ? "✓" : "×"}</span>
             <div>
-              <strong>{stealResult !== null ? (stealResult ? "Simulated steal succeeds!" : "Simulated steal fails.") : result === "correct" ? "Correct placement!" : "Not quite right."}</strong>
-              <span>{stealResult !== null ? (stealResult ? "Card ownership transfer is a multiplayer step not yet wired into this prototype." : "The original placement is resolved; the card is awarded or discarded.") : result === "correct" ? "The card has been added to your timeline." : "The card was discarded. The timeline stays unchanged."}</span>
+              <strong>{stealResult !== null ? (stealResult ? "STEAL SUCCESSFUL" : "STEAL FAILED") : result === "correct" ? "Correct placement!" : "Not quite right."}</strong>
+              <span>{stealResult !== null ? (stealResult ? "The selected player placed the card correctly and wins it." : "The selected player placed it incorrectly. The card is discarded.") : result === "correct" ? "The card has been added to your timeline." : "The card was discarded. The timeline stays unchanged."}</span>
             </div>
           </div>
           <button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button>
