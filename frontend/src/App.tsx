@@ -240,6 +240,8 @@ export default function App() {
   const [powerUpsOpen, setPowerUpsOpen] = useState(false);
   const [showLocalLobby, setShowLocalLobby] = useState(true);
   const [localPlayers, setLocalPlayers] = useState<string[]>([]);
+  const [localPlayerIndex, setLocalPlayerIndex] = useState(0);
+  const [localTokenBalances, setLocalTokenBalances] = useState<number[]>([]);
 
   useEffect(() => {
     if (state.phase !== "countdown") return;
@@ -286,7 +288,7 @@ export default function App() {
   const activeBarIndex = Math.floor((progress / 100) * WAVEFORM_HEIGHTS.length);
 
   if (showLocalLobby) {
-    return <LocalLobby onStart={(players) => { setLocalPlayers(players); setShowLocalLobby(false); }} />;
+    return <LocalLobby onStart={(players) => { setLocalPlayers(players); setLocalTokenBalances(players.map(() => 1)); setLocalPlayerIndex(0); setShowLocalLobby(false); }} />;
   }
 
   return (
@@ -299,7 +301,7 @@ export default function App() {
 
         <div className="round-label">
           <span className="live-dot" />
-          ROUND {String(state.round).padStart(2, "0")}
+          ROUND {String(state.round).padStart(2, "0")} · {localPlayers[localPlayerIndex] ?? "PLAYER"}
         </div>
 
         <button className={`token-counter chip-level-${state.tokens}`} aria-label={`Open power-ups. ${state.tokens} tokens`} aria-expanded={powerUpsOpen} onClick={() => setPowerUpsOpen((open) => !open)}>
@@ -793,6 +795,10 @@ export default function App() {
           round={state.round}
           tokens={state.tokens}
           onSpendToken={() => dispatch({ type: "SPEND_TOKEN" })}
+          localPlayers={localPlayers}
+          currentPlayerIndex={localPlayerIndex}
+          playerTokens={localTokenBalances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance)}
+          onStealSelected={(playerIndex) => setLocalTokenBalances((balances) => balances.map((balance, index) => index === playerIndex ? Math.max(0, balance - 1) : balance))}
           onPlacementResult={(nextTimeline) => dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline })}
           onNextRound={() => {
             const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
@@ -800,10 +806,14 @@ export default function App() {
               restartGame();
               return;
             }
+            const nextPlayerIndex = (localPlayerIndex + 1) % localPlayers.length;
+            setLocalTokenBalances((balances) => balances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance));
+            setLocalPlayerIndex(nextPlayerIndex);
             dispatch({
               type: "NEXT_ROUND",
               state: {
                 ...state,
+                tokens: localTokenBalances[nextPlayerIndex] ?? 1,
                 phase: state.timeline.length >= 10 ? "won" : "countdown",
                 countdown: 3,
                 seconds: 0,
