@@ -1,0 +1,352 @@
+[
+  {
+    "id": "song-001",
+    "title": "Bohemian Rhapsody",
+    "artist": "Queen",
+    "releaseYear": 1975,
+    "genre": "Rock"
+  },
+  {
+    "id": "song-002",
+    "title": "Billie Jean",
+    "artist": "Michael Jackson",
+    "releaseYear": 1982,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-003",
+    "title": "Like a Prayer",
+    "artist": "Madonna",
+    "releaseYear": 1989,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-004",
+    "title": "Smells Like Teen Spirit",
+    "artist": "Nirvana",
+    "releaseYear": 1991,
+    "genre": "Rock"
+  },
+  {
+    "id": "song-005",
+    "title": "Wonderwall",
+    "artist": "Oasis",
+    "releaseYear": 1995,
+    "genre": "Britpop"
+  },
+  {
+    "id": "song-006",
+    "title": "Wannabe",
+    "artist": "Spice Girls",
+    "releaseYear": 1996,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-007",
+    "title": "My Heart Will Go On",
+    "artist": "Celine Dion",
+    "releaseYear": 1997,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-008",
+    "title": "I Want It That Way",
+    "artist": "Backstreet Boys",
+    "releaseYear": 1999,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-009",
+    "title": "Livin' la Vida Loca",
+    "artist": "Ricky Martin",
+    "releaseYear": 1999,
+    "genre": "Latin Pop"
+  },
+  {
+    "id": "song-010",
+    "title": "Oops!... I Did It Again",
+    "artist": "Britney Spears",
+    "releaseYear": 2000,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-011",
+    "title": "In the End",
+    "artist": "Linkin Park",
+    "releaseYear": 2000,
+    "genre": "Rock"
+  },
+  {
+    "id": "song-012",
+    "title": "Hey Ya!",
+    "artist": "Outkast",
+    "releaseYear": 2003,
+    "genre": "Hip-Hop"
+  },
+  {
+    "id": "song-013",
+    "title": "Mr. Brightside",
+    "artist": "The Killers",
+    "releaseYear": 2003,
+    "genre": "Rock"
+  },
+  {
+    "id": "song-014",
+    "title": "Crazy",
+    "artist": "Gnarls Barkley",
+    "releaseYear": 2006,
+    "genre": "Soul"
+  },
+  {
+    "id": "song-015",
+    "title": "Umbrella",
+    "artist": "Rihanna",
+    "releaseYear": 2007,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-016",
+    "title": "Poker Face",
+    "artist": "Lady Gaga",
+    "releaseYear": 2008,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-017",
+    "title": "Viva la Vida",
+    "artist": "Coldplay",
+    "releaseYear": 2008,
+    "genre": "Alternative"
+  },
+  {
+    "id": "song-018",
+    "title": "Firework",
+    "artist": "Katy Perry",
+    "releaseYear": 2010,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-019",
+    "title": "Rolling in the Deep",
+    "artist": "Adele",
+    "releaseYear": 2010,
+    "genre": "Soul"
+  },
+  {
+    "id": "song-020",
+    "title": "Party Rock Anthem",
+    "artist": "LMFAO",
+    "releaseYear": 2011,
+    "genre": "Dance"
+  },
+  {
+    "id": "song-021",
+    "title": "Somebody That I Used to Know",
+    "artist": "Gotye feat. Kimbra",
+    "releaseYear": 2011,
+    "genre": "Indie Pop"
+  },
+  {
+    "id": "song-022",
+    "title": "Call Me Maybe",
+    "artist": "Carly Rae Jepsen",
+    "releaseYear": 2012,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-023",
+    "title": "Get Lucky",
+    "artist": "Daft Punk feat. Pharrell Williams",
+    "releaseYear": 2013,
+    "genre": "Disco"
+  },
+  {
+    "id": "song-024",
+    "title": "Happy",
+    "artist": "Pharrell Williams",
+    "releaseYear": 2013,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-025",
+    "title": "Shake It Off",
+    "artist": "Taylor Swift",
+    "releaseYear": 2014,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-026",
+    "title": "Uptown Funk",
+    "artist": "Mark Ronson feat. Bruno Mars",
+    "releaseYear": 2014,
+    "genre": "Funk"
+  },
+  {
+    "id": "song-027",
+    "title": "Can't Feel My Face",
+    "artist": "The Weeknd",
+    "releaseYear": 2015,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-028",
+    "title": "Hello",
+    "artist": "Adele",
+    "releaseYear": 2015,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-029",
+    "title": "Closer",
+    "artist": "The Chainsmokers feat. Halsey",
+    "releaseYear": 2016,
+    "genre": "Dance"
+  },
+  {
+    "id": "song-030",
+    "title": "Shape of You",
+    "artist": "Ed Sheeran",
+    "releaseYear": 2017,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-031",
+    "title": "Despacito",
+    "artist": "Luis Fonsi feat. Daddy Yankee",
+    "releaseYear": 2017,
+    "genre": "Latin Pop"
+  },
+  {
+    "id": "song-032",
+    "title": "Shallow",
+    "artist": "Lady Gaga & Bradley Cooper",
+    "releaseYear": 2018,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-033",
+    "title": "Old Town Road",
+    "artist": "Lil Nas X",
+    "releaseYear": 2019,
+    "genre": "Country Rap"
+  },
+  {
+    "id": "song-034",
+    "title": "Blinding Lights",
+    "artist": "The Weeknd",
+    "releaseYear": 2019,
+    "genre": "Synth-pop"
+  },
+  {
+    "id": "song-035",
+    "title": "Dance Monkey",
+    "artist": "Tones and I",
+    "releaseYear": 2019,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-036",
+    "title": "Levitating",
+    "artist": "Dua Lipa",
+    "releaseYear": 2020,
+    "genre": "Disco Pop"
+  },
+  {
+    "id": "song-037",
+    "title": "Save Your Tears",
+    "artist": "The Weeknd",
+    "releaseYear": 2020,
+    "genre": "Synth-pop"
+  },
+  {
+    "id": "song-038",
+    "title": "good 4 u",
+    "artist": "Olivia Rodrigo",
+    "releaseYear": 2021,
+    "genre": "Pop Rock"
+  },
+  {
+    "id": "song-039",
+    "title": "Stay",
+    "artist": "The Kid LAROI & Justin Bieber",
+    "releaseYear": 2021,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-040",
+    "title": "As It Was",
+    "artist": "Harry Styles",
+    "releaseYear": 2022,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-041",
+    "title": "Anti-Hero",
+    "artist": "Taylor Swift",
+    "releaseYear": 2022,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-042",
+    "title": "Flowers",
+    "artist": "Miley Cyrus",
+    "releaseYear": 2023,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-043",
+    "title": "Cruel Summer",
+    "artist": "Taylor Swift",
+    "releaseYear": 2019,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-044",
+    "title": "Water",
+    "artist": "Tyla",
+    "releaseYear": 2023,
+    "genre": "Afrobeats"
+  },
+  {
+    "id": "song-045",
+    "title": "Espresso",
+    "artist": "Sabrina Carpenter",
+    "releaseYear": 2024,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-046",
+    "title": "Birds of a Feather",
+    "artist": "Billie Eilish",
+    "releaseYear": 2024,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-047",
+    "title": "Die With a Smile",
+    "artist": "Lady Gaga & Bruno Mars",
+    "releaseYear": 2024,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-048",
+    "title": "APT.",
+    "artist": "ROSÉ & Bruno Mars",
+    "releaseYear": 2024,
+    "genre": "Pop Rock"
+  },
+  {
+    "id": "song-049",
+    "title": "Manchild",
+    "artist": "Sabrina Carpenter",
+    "releaseYear": 2025,
+    "genre": "Pop"
+  },
+  {
+    "id": "song-050",
+    "title": "Golden",
+    "artist": "HUNTR/X",
+    "releaseYear": 2025,
+    "genre": "Pop"
+  }
+]
