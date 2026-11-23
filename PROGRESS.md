@@ -18,7 +18,14 @@ Commit: `90e313ec28d10a50ac28a5da5f0443cc550ac956`
 ## Limitations
 In-memory sessions; no persistence, multiplayer synchronization, authentication, token/steal actions, frontend integration, or real audio. Reveal endpoint currently exposes metadata on request without phase authorization and must be tightened before production.
 
+## Frontend build fix
+Fixed TypeScript strict optional-value errors in local round resolution by guarding the optional `outcome.timeline` and providing safe empty-timeline fallbacks when indexing saved timelines.
+
+Commit: `09f68eff8a1f2b9649617c49940b515af021e3d8`
+
+- **Not yet verified locally:** run `npm run build` from `frontend` after pulling this commit.
+
 ## Next step
-Pull the latest `master` and run the backend. Confirm startup, then proceed to the next backend gameplay milestone and integration work.
+Pull the latest `master`, rerun the frontend build from `frontend`, and then proceed to frontend-backend integration.
 
 OOP remains central: domain encapsulates rules; services orchestrate; repository abstracts catalogue.
