@@ -84,12 +84,24 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   border-radius: 50%;
 }
 
-.token-counter {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--yellow);
-}
+.token-counter {display:flex;align-items:center;gap:8px;color:var(--yellow);border:0;background:transparent;padding:6px 0 6px 8px;cursor:pointer;position:relative}
+.token-counter strong {font-size:22px}
+.token-chip {width:34px;height:34px;border-radius:50%;display:grid;place-items:center;position:relative;border:2px dashed currentColor;transition:transform .2s ease;box-shadow:0 2px 0 #0008,inset 0 0 0 3px #171717}
+.chip-inner {width:20px;height:20px;display:grid;place-items:center;border-radius:50%;font:500 11px var(--mono);border:1px solid currentColor}
+.token-counter:hover .token-chip {transform:rotate(-8deg) scale(1.06)}
+.chip-level-0 {color:var(--red)} .chip-level-0 .token-chip {background:#27201f}
+.chip-level-1 {color:var(--paper)} .chip-level-1 .token-chip {background:#f4f1e9;border-color:#171717;box-shadow:inset 0 0 0 3px #d8d4ca,0 2px 0 #0008} .chip-level-1 .chip-inner {background:#171717;color:#f4f1e9}
+.chip-level-2 {color:#d6b56d} .chip-level-2 .token-chip {background:#171717;border-color:#d6b56d} .chip-level-2 .chip-inner {background:#d6b56d;color:#171717}
+.chip-level-3,.chip-level-4,.chip-level-5 {color:#e2bd62} .chip-level-3 .token-chip,.chip-level-4 .token-chip,.chip-level-5 .token-chip {background:#d6b56d;border-color:#f3d98c} .chip-level-3 .chip-inner,.chip-level-4 .chip-inner,.chip-level-5 .chip-inner {background:#171717;color:#e2bd62}
+.power-up-menu {position:absolute;z-index:20;right:5.5vw;top:76px;width:min(340px,calc(100vw - 40px));background:#202020;border:1px solid #454545;padding:18px;box-shadow:0 18px 50px #000b}
+.power-up-heading {display:flex;align-items:center;justify-content:space-between;color:var(--paper);font:11px var(--mono);letter-spacing:.14em}
+.power-up-close {background:transparent;border:0;color:var(--muted);font-size:24px;line-height:1}
+.power-up-subtitle {color:var(--muted);font-size:12px;margin:9px 0 14px}
+.power-up-action {width:100%;background:#292929;border:1px solid #444;color:var(--paper);padding:13px 11px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;margin-top:8px;transition:border-color .2s,background .2s}
+.power-up-action:hover:not(:disabled) {border-color:var(--yellow);background:#303030} .power-up-action:disabled {opacity:.35;cursor:not-allowed}
+.power-up-name {display:flex;align-items:center;gap:10px} .action-mark {width:28px;height:28px;border:1px solid var(--red);color:var(--red);display:grid;place-items:center;font-size:17px}
+.power-up-name strong {display:block;font-size:13px;font-weight:600} .power-up-name small {display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.action-cost {color:var(--yellow);font:10px var(--mono);white-space:nowrap} .power-up-footer {color:#777;font:9px var(--mono);letter-spacing:.08em;margin-top:14px;line-height:1.5}
 
 .token-symbol { font-size: 19px; }
 .token-counter strong { font-size: 22px; }
@@ -649,6 +661,8 @@ button:disabled { opacity: .4; cursor: not-allowed; }
   .topbar { height: 70px; }
 
   .round-label { display: none; }
+  .power-up-menu {right:20px;top:64px}
+  .token-label {font-size:9px}
 
   .game-stage {
     display: flex;
