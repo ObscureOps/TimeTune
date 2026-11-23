@@ -948,3 +948,12 @@
     animation: none;
   }
 }
+
+
+/* Steal window and rebattle simulation */
+.steal-window { border-color: var(--red); }
+.steal-actions { display:flex; flex-direction:column; gap:10px; }
+.steal-button { border:1px solid #454545; background:#222; color:var(--paper); padding:14px 18px; cursor:pointer; }
+.steal-button:hover:not(:disabled) { border-color:var(--yellow); color:var(--yellow); }
+.steal-button:disabled { opacity:.35; cursor:not-allowed; }
+.timeline-secondary { color:#aaa; border:0; background:transparent; text-decoration:underline; text-underline-offset:4px; font-size:12px; cursor:pointer; }
