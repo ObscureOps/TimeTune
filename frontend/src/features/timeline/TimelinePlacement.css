@@ -987,3 +987,12 @@
 .timeline-feedback.steal-failure .feedback-icon{width:54px;height:54px;background:#ff4e36;color:#171717;font-size:26px}
 .timeline-feedback.steal-failure .steal-result-title{color:#ff4e36;font-size:17px;letter-spacing:.02em}
 @media(max-width:620px){.local-steal-player-list{max-height:38vh}.timeline-feedback.steal-success .feedback-heading,.timeline-feedback.steal-failure .feedback-heading{align-items:flex-start}}
+
+/* Strongly differentiated steal resolution states */
+.timeline-feedback.steal-success{border:3px solid #e9ff55;background:#18200c;box-shadow:0 0 0 4px rgba(233,255,85,.1),0 0 42px rgba(233,255,85,.2)}
+.timeline-feedback.steal-success .feedback-heading strong{color:#e9ff55}
+.timeline-feedback.steal-success .feedback-heading span:not(.feedback-icon){color:#f4f1e9}
+.timeline-feedback.steal-failure{border:3px solid #ff4e36;background:#26110e;box-shadow:0 0 0 4px rgba(255,78,54,.1),0 0 36px rgba(255,78,54,.15)}
+.timeline-feedback.steal-failure .feedback-heading strong{color:#ff4e36}
+.timeline-feedback.steal-failure .feedback-heading span:not(.feedback-icon){color:#f4f1e9}
+.local-steal-player-list{max-height:min(360px,40vh);overflow-y:auto;overscroll-behavior:contain}
