@@ -309,9 +309,6 @@ export default function App() {
           <span className="live-dot" />
           ROUND {String(state.round).padStart(2, "0")} · {localPlayers[localPlayerIndex] ?? "PLAYER"}
         </div>
-        <div className="local-scoreboard" aria-label="Local player standings">
-          {localPlayers.map((player, index) => <span key={index} className={index === localPlayerIndex ? "scoreboard-player active" : "scoreboard-player"}><strong>{player}</strong><small>{localTimelines[index]?.length ?? 0}/10 · {index === localPlayerIndex ? state.tokens : localTokenBalances[index] ?? 1} chips</small></span>)}
-        </div>
 
         <button className={`token-counter chip-level-${state.tokens}`} aria-label={`Open power-ups. ${state.tokens} tokens`} aria-expanded={powerUpsOpen} onClick={() => setPowerUpsOpen((open) => !open)}>
           <span className="token-chip" aria-hidden="true"><span className="chip-inner">{state.tokens}</span></span><strong>{state.tokens}</strong><span className="token-label">POWER-UPS</span>
