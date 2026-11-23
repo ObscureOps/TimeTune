@@ -789,7 +789,7 @@ export default function App() {
                 const insertionIndex = getCorrectInsertionIndex(state.drawnSong, nextTimeline);
                 nextTimeline.splice(insertionIndex, 0, state.drawnSong);
                 if (!nextSong) {
-                  dispatch({ type: "DIRECT_CLAIM", state: { ...state, phase: "placement", timeline: nextTimeline, tokens: state.tokens - 3 } });
+                  restartGame();
                   return;
                 }
                 dispatch({
