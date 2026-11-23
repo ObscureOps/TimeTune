@@ -30,7 +30,7 @@ export default function LocalLobby({ onStart }: Props) {
       <section className="local-lobby">
         <p className="local-lobby-eyebrow">ONE DEVICE · PASS IT AROUND</p>
         <h1>Who is<br />playing?</h1>
-        <p className="local-lobby-description">Set up your crew. Everyone gets their own timeline and takes turns on this device.</p>
+        <p className="local-lobby-description">Add your players, then tap any name to edit it before the game starts. Everyone gets their own timeline and takes turns on this device.</p>
         <div className="local-player-list">
           {players.map((player, index) => (
             <div className="local-player-row" key={index}>
