@@ -1,0 +1,3 @@
+package com.timetune.service;
+import com.timetune.domain.Song;import com.timetune.repository.SongRepository;import org.springframework.stereotype.Service;import java.util.List;
+@Service public class SongCatalogService {private final SongRepository repo;public SongCatalogService(SongRepository repo){this.repo=repo;}public List<Song> all(){return repo.findAll();}public Song require(String id){return repo.findByCatalogueId(id).orElseThrow(()->new IllegalArgumentException("Song not found: "+id));}}
