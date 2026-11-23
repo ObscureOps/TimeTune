@@ -1,0 +1,20 @@
+.local-lobby-shell{min-height:100vh;padding:0 5.5vw;background:var(--ink);color:var(--paper)}
+.local-lobby-topbar{height:86px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #333}
+.local-mode-badge{display:flex;align-items:center;gap:8px;color:var(--yellow);font:10px var(--mono);letter-spacing:.12em}
+.local-mode-badge span{width:6px;height:6px;background:var(--yellow);border-radius:50%}
+.local-lobby{max-width:560px;margin:0 auto;padding:clamp(50px,9vh,100px) 0 50px}
+.local-lobby-eyebrow{font:11px var(--mono);letter-spacing:.14em;color:var(--red);margin:0 0 22px}
+.local-lobby h1{font-size:clamp(64px,11vw,116px);line-height:.82;letter-spacing:-.08em;margin:0;font-weight:700}
+.local-lobby-description{color:#aaa79f;line-height:1.6;max-width:400px;margin:24px 0 34px}
+.local-player-list{display:flex;flex-direction:column;gap:10px}
+.local-player-row{display:flex;align-items:center;gap:14px;background:#222;border:1px solid #393939;padding:8px 14px}
+.local-player-number{color:var(--red);font:11px var(--mono)}
+.local-player-row input{flex:1;background:transparent;border:0;outline:none;color:var(--paper);font:500 16px var(--display);padding:8px 0;min-width:0}
+.local-remove-player{background:transparent;border:0;color:#777;font-size:23px;cursor:pointer;padding:0 4px}
+.local-add-player{display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:1px dashed #555;color:var(--paper);padding:13px 15px;margin-top:10px;text-align:left}
+.local-add-player span{font:10px var(--mono);color:#777}
+.local-start-button{width:100%;display:flex;justify-content:space-between;align-items:center;background:var(--red);border:0;color:var(--ink);font-weight:700;padding:18px 20px;margin-top:24px;font-size:14px}
+.local-start-button:disabled{opacity:.4;cursor:not-allowed}
+.local-start-button span{font-size:20px}
+.local-lobby-footnote{text-align:center;color:#777;font:9px var(--mono);letter-spacing:.12em;margin-top:18px}
+@media(max-width:620px){.local-lobby-shell{padding:0 20px}.local-lobby-topbar{height:70px}.local-lobby{padding-top:65px}.local-lobby h1{font-size:72px}}
