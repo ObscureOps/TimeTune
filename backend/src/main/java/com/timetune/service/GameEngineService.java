@@ -1,0 +1,13 @@
+package com.timetune.service;
+import com.timetune.audio.AudioProvider;import com.timetune.domain.*;import org.springframework.stereotype.Service;import java.util.*;import java.util.concurrent.ConcurrentHashMap;
+@Service public class GameEngineService {
+ private final SongSelectionService selector;private final AudioProvider audio;private final Map<UUID,GameSession> games=new ConcurrentHashMap<>();private final Map<UUID,Song> prompts=new ConcurrentHashMap<>();
+ public GameEngineService(SongSelectionService selector,AudioProvider audio){this.selector=selector;this.audio=audio;}
+ public synchronized GameSession create(List<String> names,GameSession.Mode mode){if(names==null||names.size()<2||names.size()>8)throw new IllegalArgumentException("A game requires 2-8 players");if(names.stream().anyMatch(n->n==null||n.isBlank()))throw new IllegalArgumentException("Player names cannot be blank");GameSession s=GameSession.create(mode);Set<UUID> refs=new HashSet<>();for(String name:names){Song ref=selector.reference(refs);refs.add(ref.getId());s.addPlayer(Player.create(name,ref));}games.put(s.getId(),s);return s;}
+ public GameSession require(UUID id){GameSession s=games.get(id);if(s==null)throw new IllegalArgumentException("Game not found");return s;}
+ public synchronized GameSession start(UUID id){GameSession s=require(id);s.start();next(s);return s;}
+ public synchronized Song prompt(UUID id){GameSession s=require(id);if(s.getStatus()!=GameSession.Status.ACTIVE)throw new IllegalStateException("Game is not active");Song p=prompts.get(id);if(p==null)throw new IllegalStateException("Prompt unavailable");return p;}
+ public synchronized boolean place(UUID gameId,UUID playerId,int index){GameSession s=require(gameId);if(s.getStatus()!=GameSession.Status.ACTIVE)throw new IllegalStateException("Game is not active");Player p=s.getActivePlayer();if(!p.getId().equals(playerId))throw new IllegalStateException("Not active player's turn");Song song=prompt(gameId);boolean correct=p.getTimeline().isPlacementCorrect(song,index);if(correct)p.getTimeline().addOfficialCard(song,index);s.markSongUsed(song);s.checkWinner();audio.stop();if(s.getStatus()!=GameSession.Status.FINISHED){s.advanceTurn();next(s);}return correct;}
+ public synchronized void stop(UUID id){require(id);audio.stop();prompts.remove(id);}
+ private void next(GameSession s){Song p=selector.unused(s);prompts.put(s.getId(),p);audio.prepare(p);}
+}
