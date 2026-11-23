@@ -14,6 +14,7 @@ Last updated: 2026-11-23
 - Guessing phase — `frontend/src/App.tsx` — song title and artist inputs.
 - Reveal phase — `frontend/src/App.tsx` — displays song details and guess result.
 - Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface, chronological timeline, and timeline carry-forward between rounds.
+- Placement lock and steal window — `frontend/src/features/timeline/TimelinePlacement.tsx` — player locks their slot before a pass/reveal or simulated steal rebattle; steal costs one token and correct placements cannot be stolen. The current solo simulation does not yet transfer ownership to a second player's timeline.
 - Multi-round gameplay state — `frontend/src/App.tsx` — tracks round number, used songs, official timeline, and draws the next unused configured song after placement.
 - Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
 - Ten-card win condition — `frontend/src/App.tsx` — correct placements and direct claims trigger a victory screen when the official timeline reaches 10 cards.
@@ -69,6 +70,19 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
+Milestone 2.7b — Placement lock and steal-window simulation
+
+Status: Implemented in GitHub; local build/test not run.
+
+Files:
+- `frontend/src/features/timeline/TimelinePlacement.tsx` — placement is locked first; a steal window appears before reveal. The user can pass or spend one token to simulate a steal and choose a rebattle slot. Song reveal happens after the decision. A correctly placed original card is protected from stealing.
+- `frontend/src/App.tsx` — connects simulated steal token cost to the token balance.
+- `frontend/src/features/timeline/TimelinePlacement.css` — styles steal-window controls.
+
+Limitation: This is a single-player simulation only. It does not model first-commit arbitration, a separate opponent timeline, or transfer ownership. Those require player state/multiplayer.
+
+## Previous milestone
+
 Milestone 2.7 — Win condition
 
 Status: Implemented in GitHub; local build/test not run.
@@ -80,4 +94,4 @@ Note: Steal mechanics are deferred until player/opponent state and multiplayer t
 
 ## Next milestone
 
-Milestone 2.7b — Steal mechanics foundation
+Milestone 2.7c — Persistent player timelines and opponent ownership
