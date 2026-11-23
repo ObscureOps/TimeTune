@@ -18,7 +18,7 @@ Last updated: 2026-11-23
 - Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
 - Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, and placement phases.
 - Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
-- Token actions — `frontend/src/App.tsx` — skipping costs 1 token; direct claim costs 3 and adds the card in chronological order without placement risk. Token spending is disabled when insufficient tokens.
+- Token chip UI — `frontend/src/App.tsx`, `frontend/src/index.css` — clickable chip balance opens a power-up menu; color changes by balance (red at 0, ivory at 1, black/gold at 2, gold at 3+). Skip (1) and Direct Claim (3) are available there.
 - Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
 - Song type — `frontend/src/types/song.ts` — shared song data interface.
 - Song selection — `frontend/src/utils/songUtils.ts` — random unused song selection.
@@ -38,7 +38,7 @@ Last updated: 2026-11-23
 
 ## Next up
 
-1. Test multi-round timeline and token actions locally (`npm run build`).
+1. Test token-chip menu, skip/direct claim, and multi-round timeline locally (`npm run build`).
 2. Replace `YouTubePlayer.tsx` with the improved implementation.
 2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
 3. Verify playback behavior when changing songs.
@@ -68,12 +68,12 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.6 — Token actions and rule alignment
+Milestone 2.6 — Token actions and UI refinement
 
 Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/App.tsx` — stores official timeline, round count, and used song IDs; draws the next unused configured song and resets listening phases. Implements skip (1 token) and direct claim (3 tokens), with correct chronological insertion for direct claims.
+- `frontend/src/App.tsx` — stores official timeline, round count, and used song IDs; draws the next unused configured song and resets listening phases. Implements chip power-up menu, skip (1 token), and direct claim (3 tokens), with correct chronological insertion for direct claims.
 - `frontend/src/features/timeline/TimelinePlacement.tsx` — accepts carried timeline state and reports successful placements to the game state. The initial reference song is used only for the first placement and is not carried into the official timeline.
 
 ## Next milestone
