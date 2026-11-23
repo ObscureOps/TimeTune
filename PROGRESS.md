@@ -30,8 +30,8 @@ Last updated: 2026-11-24
 
 ## In progress
 
-- Local Mode — lobby, rotating active-player indicator, per-player chip balances and timelines, steal picker, rebattle on the selected player's timeline, successful card ownership transfer, and pass-the-device handoff screen are implemented. Current player and chip-less players cannot steal. A compact standings strip tracks each player's official card count and chips. Victory is checked across local player timelines after round resolution.
-
+- Local Mode — lobby, rotating active-player indicator, per-player chip balances and timelines, steal picker, rebattle on the selected player's timeline, successful card ownership transfer, pass-the-device handoff screen, and compact standings strip are implemented. Current player and chip-less players cannot steal.
+- Local round-resolution synchronization — fixed a stale React-state issue where the next-round callback could miss a card earned or transferred in the immediately preceding placement/steal. The resolved timeline is now passed directly into round advancement, and the stealer's chip cost is persisted alongside the card transfer.
 
 - Player reliability — `frontend/src/features/player/YouTubePlayer.tsx`
   - Shared YouTube API loader.
@@ -45,8 +45,8 @@ Last updated: 2026-11-24
 
 1. Run frontend build and test local lobby, handoff, timeline, steal transfer, and individual victory flow.
 2. Audit state synchronization and rule edge cases (direct claim, steal-win, reference-card handling).
-3. Replace `YouTubePlayer.tsx` with the improved implementation.
-2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
+3. Add local save/resume and clean game-exit/restart behavior.
+4. Replace `YouTubePlayer.tsx` with the improved implementation and test API loading, initialization, play, pause, replay, skip, and cleanup.
 3. Verify playback behavior when changing songs.
 4. Improve error messaging for unavailable or restricted videos.
 5. Configure YouTube video IDs for the remaining songs.
@@ -74,14 +74,13 @@ Last updated: 2026-11-24
 
 ## Current milestone
 
-Milestone 3.0 — Local handoff, standings, and ownership-aware victory flow
+Milestone 3.1 — Local round resolution synchronization
 
 Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/App.tsx` — adds a concealed-song handoff screen between local turns, a next-player readiness button, per-player standings, syncs direct claims into the local timeline, and checks all local timelines for the 10-card victory condition at round transition.
-- `frontend/src/index.css` — styles the standings strip and handoff screen responsively.
-- `frontend/src/features/timeline/TimelinePlacement.tsx` — rebattle uses the selected player's timeline; successful steals transfer the official card; original player keeps a correct placement; both wrong means discard.
+- `frontend/src/features/timeline/TimelinePlacement.tsx` — passes the finalized round ownership/timeline into round advancement so React state batching cannot drop a just-earned or stolen card.
+- `frontend/src/App.tsx` — round advancement now resolves card ownership and the steal-chip deduction from the placement outcome before checking the 10-card win condition.
 
 Remaining verification: run build/tests and manually check handoff privacy, direct claim score sync, chip sync, empty timeline rebattle, and a steal that puts a player at 10 cards. Local-only implementation; online multiplayer requires backend/server authority.
 
