@@ -420,15 +420,17 @@ export default function TimelinePlacement({
           <button className="timeline-secondary" onClick={() => {setStealMode(false);setStealSlot(null);}}>Cancel steal</button>
         </div>
       ) : (
-        <div className={`timeline-feedback ${stealResult === true ? "steal-success" : stealResult === false ? "steal-failure" : result}`}>
-          <div className="feedback-heading">
-            <span className="feedback-icon">{stealResult === true ? "🏆" : stealResult === false ? "×" : result === "correct" ? "✓" : "×"}</span>
-            <div>
-              <strong className="steal-result-title">{stealResult !== null ? (stealResult ? "🏆 STEAL SUCCESSFUL — CARD TRANSFERRED!" : "STEAL FAILED — NO CARD WON") : result === "correct" ? "CORRECT PLACEMENT — CARD SECURED" : "INCORRECT PLACEMENT — CARD DISCARDED"}</strong>
-              <span>{stealResult !== null ? (stealResult ? "The original player was wrong AND the stealer was correct. The card is awarded to the stealer." : result === "correct" ? "The original player was correct. They keep the card; the stealer loses the chip." : "BOTH PLACEMENTS WERE WRONG. The card is discarded—nobody gets it. The stealer still spent 1 chip.") : result === "correct" ? "The card has been added to the active player’s timeline." : "The active player was wrong. No card is awarded; the card is discarded."}</span>
+        <div className={`timeline-verdict ${stealResult === true ? "verdict-won" : stealResult === false ? "verdict-lost" : result === "correct" ? "verdict-kept" : "verdict-missed"}`}>
+          <div className="verdict-rule"><span>ROUND RESULT</span><span>TT / {String(round).padStart(2, "0")}</span></div>
+          <div className="verdict-main">
+            <span className="verdict-mark">{stealResult === true ? "↗" : stealResult === false ? "×" : result === "correct" ? "✓" : "×"}</span>
+            <div className="verdict-copy">
+              <p className="verdict-kicker">{stealResult !== null ? "STEAL ATTEMPT" : "PLACEMENT"}</p>
+              <h2>{stealResult !== null ? (stealResult ? "Card stolen." : "No one takes it.") : result === "correct" ? "In the right place." : "Out of time."}</h2>
+              <p>{stealResult !== null ? (stealResult ? "The active player missed. The stealer's placement was right—the card changes hands." : result === "correct" ? "The active player had it right. Their card stays; the steal chip is spent." : "Both placements missed. The card is discarded, and the steal chip is spent.") : result === "correct" ? "The card joins the active player's timeline." : "The placement missed. This card is discarded."}</p>
             </div>
           </div>
-          <button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button>
+          <div className="verdict-footer"><span>{stealResult === true ? "CARD → STEALER" : stealResult === false ? result === "correct" ? "CARD → ACTIVE PLAYER" : "CARD → DISCARD" : result === "correct" ? "CARD → TIMELINE" : "CARD → DISCARD"}</span><button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button></div>
         </div>
       )}
     </section>
