@@ -305,10 +305,6 @@ export default function App() {
           <span>TimeTune</span>
         </a>
 
-        <div className="round-label">
-          <span className="live-dot" />
-          ROUND {String(state.round).padStart(2, "0")} · {localPlayers[localPlayerIndex] ?? "PLAYER"}
-        </div>
 
         <button className={`token-counter chip-level-${state.tokens}`} aria-label={`Open power-ups. ${state.tokens} tokens`} aria-expanded={powerUpsOpen} onClick={() => setPowerUpsOpen((open) => !open)}>
           <span className="token-chip" aria-hidden="true"><span className="chip-inner">{state.tokens}</span></span><strong>{state.tokens}</strong><span className="token-label">POWER-UPS</span>
