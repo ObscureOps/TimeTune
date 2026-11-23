@@ -630,6 +630,15 @@ export default function App() {
                 >
                   Guess now <span>↗</span>
                 </button>
+              <button
+                className="text-control skip-guess-control"
+                onClick={() => {
+                  playerControlsRef.current?.pause();
+                  dispatch({ type: "CONTINUE" });
+                }}
+              >
+                Skip guess <span>→</span>
+              </button>
               </div>
 
               <button
@@ -715,17 +724,6 @@ export default function App() {
               >
                 Lock it in <span>↗</span>
               </button>
-
-              <button
-                className="text-control skip-guess-control"
-                type="button"
-                onClick={() => {
-                  playerControlsRef.current?.pause();
-                  dispatch({ type: "CONTINUE" });
-                }}
-              >
-                Skip guess <span>→</span>
-              </button>
             </form>
           )}
         </section>
@@ -799,6 +797,8 @@ export default function App() {
           localPlayers={localPlayers}
           currentPlayerIndex={localPlayerIndex}
           playerTokens={localTokenBalances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance)}
+          playerTimelines={localTimelines}
+          onStealPlacementResult={(playerIndex, nextTimeline) => setLocalTimelines((timelines) => timelines.map((timeline, index) => index === playerIndex ? nextTimeline : timeline))}
           onStealSelected={(playerIndex) => setLocalTokenBalances((balances) => balances.map((balance, index) => index === playerIndex ? Math.max(0, balance - 1) : balance))}
           onPlacementResult={(nextTimeline) => { setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? nextTimeline : timeline)); dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline }); }}
           onNextRound={() => {
