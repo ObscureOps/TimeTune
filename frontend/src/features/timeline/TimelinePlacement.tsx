@@ -399,7 +399,7 @@ export default function TimelinePlacement({
         </div>
       ) : !revealed && !stealMode ? (
         <div className="timeline-feedback steal-window">
-          <div className="feedback-heading"><span className="feedback-icon">!</span><div><strong>Steal window open</strong><span>Players decide their own house rules. Choose who agreed to steal.</span></div></div>
+          <div className="feedback-heading"><span className="feedback-icon">!</span><div><strong>Steal window open</strong><span>Scroll to select any player with at least 1 chip. The current player and chip-less players cannot steal.</span></div></div>
           <div className="local-steal-player-list" role="list">
             {localPlayers.map((player, index) => {
               const balance = playerTokens[index] ?? 0;
@@ -415,17 +415,17 @@ export default function TimelinePlacement({
         </div>
       ) : !revealed && stealMode ? (
         <div className="timeline-actions">
-          <p className="timeline-action-hint">Drag the mystery card to a different slot. The original player’s locked slot is unavailable.</p>
+          <p className="timeline-action-hint">Drag the mystery card to any open timeline slot. The original player's locked slot is blocked.</p>
           <button className="timeline-primary" disabled={stealSlot === null || stealSlot === lockedSlot} onClick={resolveSteal}>Lock rebattle <span>↗</span></button>
-          <button className="timeline-secondary" onClick={() => {setStealMode(false);setStealSlot(null);}}>Cancel simulation</button>
+          <button className="timeline-secondary" onClick={() => {setStealMode(false);setStealSlot(null);}}>Cancel steal</button>
         </div>
       ) : (
         <div className={`timeline-feedback ${stealResult === true ? "steal-success" : stealResult === false ? "steal-failure" : result}`}>
           <div className="feedback-heading">
             <span className="feedback-icon">{stealResult === true ? "🏆" : stealResult === false ? "×" : result === "correct" ? "✓" : "×"}</span>
             <div>
-              <strong className="steal-result-title">{stealResult !== null ? (stealResult ? "STEAL SUCCESSFUL — CARD WON!" : "STEAL FAILED — CARD DISCARDED") : result === "correct" ? "CORRECT PLACEMENT — CARD SECURED" : "INCORRECT PLACEMENT — CARD DISCARDED"}</strong>
-              <span>{stealResult !== null ? (stealResult ? "The original placement was wrong, but the stealer placed it correctly. The card transfers to the stealer." : result === "correct" ? "The original player was correct. Their card stays; the steal attempt fails." : "Both placements were wrong. Nobody receives the card; it is discarded. The stealer still spent 1 token.") : result === "correct" ? "The card has been added to the active player’s timeline." : "The active player was wrong. No card is awarded and it is discarded."}</span>
+              <strong className="steal-result-title">{stealResult !== null ? (stealResult ? "🏆 STEAL SUCCESSFUL — CARD TRANSFERRED!" : "STEAL FAILED — NO CARD WON") : result === "correct" ? "CORRECT PLACEMENT — CARD SECURED" : "INCORRECT PLACEMENT — CARD DISCARDED"}</strong>
+              <span>{stealResult !== null ? (stealResult ? "The original player was wrong AND the stealer was correct. The card is awarded to the stealer." : result === "correct" ? "The original player was correct. They keep the card; the stealer loses the chip." : "BOTH PLACEMENTS WERE WRONG. The card is discarded—nobody gets it. The stealer still spent 1 chip.") : result === "correct" ? "The card has been added to the active player’s timeline." : "The active player was wrong. No card is awarded; the card is discarded."}</span>
             </div>
           </div>
           <button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button>
