@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/features/player/YouTubePlayer.tsx","./src/features/timeline/TimelinePlacement.tsx","./src/types/song.ts","./src/utils/songUtils.ts"],"version":"5.9.3"}

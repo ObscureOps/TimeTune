@@ -1,0 +1,420 @@
+import { useState } from "react";
+import type { Song } from "../../types/song";
+import { isCorrectPlacement } from "../../utils/songUtils";
+import "./TimelinePlacement.css";
+
+type PlacementResult = "correct" | "incorrect" | null;
+
+type Props = {
+  startingSong: Song;
+  drawnSong: Song;
+  onRestart: () => void;
+};
+
+export default function TimelinePlacement({
+  startingSong,
+  drawnSong,
+  onRestart,
+}: Props) {
+  const [timeline, setTimeline] = useState<Song[]>([
+    startingSong,
+  ]);
+
+  const [selectedSlot, setSelectedSlot] = useState<number | null>(
+    null,
+  );
+
+  const [dragOverSlot, setDragOverSlot] = useState<number | null>(
+    null,
+  );
+
+  const [revealed, setRevealed] = useState(false);
+  const [result, setResult] = useState<PlacementResult>(null);
+  const [completed, setCompleted] = useState(false);
+
+  const slots = timeline.length + 1;
+
+  function selectSlot(slotIndex: number) {
+    if (revealed) return;
+
+    setSelectedSlot(slotIndex);
+    setDragOverSlot(null);
+  }
+
+  function handleDragStart(
+    event: React.DragEvent<HTMLDivElement>,
+  ) {
+    if (revealed) {
+      event.preventDefault();
+      return;
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", drawnSong.id);
+
+    setDragOverSlot(null);
+  }
+
+  function handleDragOver(
+    event: React.DragEvent<HTMLButtonElement>,
+    slotIndex: number,
+  ) {
+    if (revealed) return;
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+
+    setDragOverSlot(slotIndex);
+  }
+
+  function handleDrop(
+    event: React.DragEvent<HTMLButtonElement>,
+    slotIndex: number,
+  ) {
+    event.preventDefault();
+
+    if (revealed) return;
+
+    const draggedCard = event.dataTransfer.getData("text/plain");
+
+    if (draggedCard !== drawnSong.id) return;
+
+    setSelectedSlot(slotIndex);
+    setDragOverSlot(null);
+  }
+
+  function commitPlacement() {
+    if (selectedSlot === null || revealed) return;
+
+    const correct = isCorrectPlacement(
+      drawnSong,
+      timeline,
+      selectedSlot,
+    );
+
+    setRevealed(true);
+    setResult(correct ? "correct" : "incorrect");
+
+    if (correct) {
+      const nextTimeline = [...timeline];
+
+      nextTimeline.splice(selectedSlot, 0, drawnSong);
+
+      setTimeline(nextTimeline);
+    }
+  }
+
+  function continueGame() {
+    setCompleted(true);
+  }
+
+  function resetPlacement() {
+    setTimeline([startingSong]);
+    setSelectedSlot(null);
+    setDragOverSlot(null);
+    setRevealed(false);
+    setResult(null);
+    setCompleted(false);
+  }
+
+  if (completed) {
+    return (
+      <section className="timeline-stage timeline-complete">
+        <div className="timeline-result-icon">✓</div>
+
+        <p className="timeline-eyebrow">PLACEMENT COMPLETE</p>
+
+        <h1>Nice work.</h1>
+
+        <p className="timeline-description">
+          You've successfully completed this timeline placement
+          prototype.
+        </p>
+
+        <div className="timeline-summary">
+          <span className="summary-label">YOUR TIMELINE</span>
+
+          <div className="summary-cards">
+            {timeline.map((card) => (
+              <div className="summary-card" key={card.id}>
+                <span>{card.year}</span>
+                <strong>{card.title}</strong>
+                <small>{card.artist}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button className="timeline-primary" onClick={onRestart}>
+          Play listening phase again <span>↻</span>
+        </button>
+
+        <button
+          className="timeline-secondary"
+          onClick={resetPlacement}
+        >
+          Try placement again
+        </button>
+      </section>
+    );
+  }
+
+  return (
+    <section className="timeline-stage">
+      <header className="timeline-heading">
+        <div>
+          <p className="timeline-eyebrow">
+            THE CHRONOLOGICAL CHALLENGE
+          </p>
+
+          <h1>
+            Where does
+            <br />
+            it belong?
+          </h1>
+        </div>
+
+        <div className="timeline-round">
+          <span>YOUR TIMELINE</span>
+          <strong>
+            {timeline.length} {timeline.length === 1 ? "CARD" : "CARDS"}
+          </strong>
+        </div>
+      </header>
+
+      <p className="timeline-description">
+        Drag the mystery card into the timeline. The cards will make
+        room for your placement.
+      </p>
+
+      <div className="timeline-board">
+        <div className="timeline-track-label">
+          <span>EARLIER</span>
+          <span className="timeline-track-line" />
+          <span>LATER</span>
+        </div>
+
+        <div className="timeline-cards">
+          {Array.from({ length: slots }, (_, slotIndex) => {
+            const isSelected = selectedSlot === slotIndex;
+            const isDragOver = dragOverSlot === slotIndex;
+
+            return (
+              <div
+                className={`timeline-position ${
+                  isSelected ? "position-selected" : ""
+                } ${
+                  isDragOver ? "position-drag-over" : ""
+                }`}
+                key={`slot-${slotIndex}`}
+              >
+                <button
+                  className={`timeline-slot ${
+                    isSelected ? "selected" : ""
+                  } ${
+                    isDragOver ? "drag-over" : ""
+                  } ${revealed ? "locked" : ""}`}
+                  onClick={() => selectSlot(slotIndex)}
+                  onDragOver={(event) =>
+                    handleDragOver(event, slotIndex)
+                  }
+                  onDragLeave={() => {
+                    if (dragOverSlot === slotIndex) {
+                      setDragOverSlot(null);
+                    }
+                  }}
+                  onDrop={(event) =>
+                    handleDrop(event, slotIndex)
+                  }
+                  disabled={revealed}
+                  aria-label={`Place song at position ${
+                    slotIndex + 1
+                  }`}
+                >
+                  <span className="slot-plus">
+                    {isSelected || isDragOver ? "↓" : "+"}
+                  </span>
+
+                  <span className="slot-label">
+                    {isDragOver
+                      ? "DROP HERE"
+                      : isSelected
+                        ? "SELECTED"
+                        : "PLACE HERE"}
+                  </span>
+                </button>
+
+                {slotIndex < timeline.length && (
+                  <TimelineCard card={timeline[slotIndex]} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="timeline-card-area">
+        <div className="timeline-card-instruction">
+          <span className="instruction-line" />
+
+          <span>
+            {revealed
+              ? "CARD REVEALED"
+              : "DRAG THE CARD INTO YOUR TIMELINE"}
+          </span>
+
+          <span className="instruction-line" />
+        </div>
+
+        <div
+          className={`drawn-card ${
+            revealed ? "flipped" : ""
+          } ${
+            selectedSlot !== null && !revealed
+              ? "card-selected"
+              : ""
+          }`}
+          draggable={!revealed}
+          onDragStart={handleDragStart}
+          onDragEnd={() => setDragOverSlot(null)}
+          role="group"
+          aria-label="Mystery song card. Drag it to a timeline position."
+        >
+          <div className="drawn-card-front">
+            <div className="card-front-top">
+              <span className="card-edition">TT / 004</span>
+              <span className="card-symbol">✳</span>
+            </div>
+
+            <div className="card-vinyl-art">
+              <div className="card-vinyl">
+                <div className="card-vinyl-grooves" />
+
+                <div className="card-vinyl-label">
+                  <span>TT</span>
+                </div>
+              </div>
+
+              <div className="card-art-orbit orbit-one" />
+              <div className="card-art-orbit orbit-two" />
+            </div>
+
+            <div className="card-front-bottom">
+              <span className="card-brand">TIMETUNE</span>
+              <span className="card-question">?</span>
+              <span className="card-year-label">UNKNOWN YEAR</span>
+            </div>
+
+            <div className="card-drag-indicator">
+              <span>↕</span>
+              DRAG TO PLACE
+            </div>
+          </div>
+
+          <div className="drawn-card-back">
+            <div className="card-back-top">
+              <span>TIME TUNE</span>
+              <span>REVEALED</span>
+            </div>
+
+            <div className="card-back-art">
+              <div className="card-back-disc">
+                <div className="card-back-label">TT</div>
+              </div>
+            </div>
+
+            <span className="drawn-card-year">
+              {drawnSong.year}
+            </span>
+
+            <strong>{drawnSong.title}</strong>
+
+            <span className="drawn-card-artist">
+              {drawnSong.artist}
+            </span>
+
+            <div className="card-back-bottom">
+              <span>THE CHRONOLOGICAL CHALLENGE</span>
+              <span>004 / 030</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {!revealed ? (
+        <div className="timeline-actions">
+          <button
+            className="timeline-primary"
+            disabled={selectedSlot === null}
+            onClick={commitPlacement}
+          >
+            Lock placement <span>↗</span>
+          </button>
+
+          <p className="timeline-action-hint">
+            {selectedSlot === null
+              ? "Drag the card to a position, or tap a slot."
+              : "Placement locked in once you commit."}
+          </p>
+        </div>
+      ) : (
+        <div className={`timeline-feedback ${result}`}>
+          <div className="feedback-heading">
+            <span className="feedback-icon">
+              {result === "correct" ? "✓" : "×"}
+            </span>
+
+            <div>
+              <strong>
+                {result === "correct"
+                  ? "Correct placement!"
+                  : "Not quite right."}
+              </strong>
+
+              <span>
+                {result === "correct"
+                  ? "The card has been added to your timeline."
+                  : "The card was discarded. The timeline stays unchanged."}
+              </span>
+            </div>
+          </div>
+
+          <button
+            className="timeline-primary"
+            onClick={continueGame}
+          >
+            Continue <span>↗</span>
+          </button>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function TimelineCard({ card }: { card: Song }) {
+  return (
+    <article className="timeline-song-card">
+      <div className="timeline-card-top">
+        <span className="timeline-card-year">
+          {card.year}
+        </span>
+
+        <span className="timeline-card-icon">✳</span>
+      </div>
+
+      <div className="timeline-card-art">
+        <div className="timeline-card-disc">
+          <div className="timeline-card-disc-label" />
+        </div>
+      </div>
+
+      <strong>{card.title}</strong>
+
+      <span className="timeline-card-artist">
+        {card.artist}
+      </span>
+
+      <span className="timeline-card-number">TT / 001</span>
+    </article>
+  );
+}
