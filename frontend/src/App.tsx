@@ -3,7 +3,7 @@ import YouTubePlayer, { type YouTubePlayerControls, type PlaybackState } from ".
 import type { CSSProperties } from "react";
 import songs from "./data/songs.json";
 import type { Song } from "./types/song";
-import { getRandomUnusedSong } from "./utils/songUtils";
+import { getRandomUnusedSong, getCorrectInsertionIndex } from "./utils/songUtils";
 import TimelinePlacement from "./features/timeline/TimelinePlacement";
 
 type Phase =
@@ -36,7 +36,8 @@ type Action =
   | { type: "SET_PROGRESS"; seconds: number; duration: number }
   | { type: "OPEN_GUESS" }
   | { type: "REPLAY" }
-  | { type: "SKIP_TO_PLACEMENT" }
+  | { type: "SKIP_SONG"; state: GameState }
+  | { type: "DIRECT_CLAIM"; state: GameState }
   | { type: "SET_TITLE"; value: string }
   | { type: "SET_ARTIST"; value: string }
   | { type: "LOCK_GUESS" }
@@ -154,12 +155,11 @@ function reducer(state: GameState, action: Action): GameState {
         phase: "listening",
       };
 
-    case "SKIP_TO_PLACEMENT":
-      return {
-        ...state,
-        phase: "placement",
-        playing: false,
-      };
+    case "SKIP_SONG":
+      return action.state;
+
+    case "DIRECT_CLAIM":
+      return action.state;
 
     case "SET_TITLE":
       return {
@@ -603,10 +603,31 @@ export default function App() {
                   className="text-control"
                   onClick={() => {
                     playerControlsRef.current?.stop();
-                    dispatch({ type: "SKIP_TO_PLACEMENT" });
+                    const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
+                    if (state.tokens < 1 || !nextSong) return;
+                    dispatch({
+                      type: "SKIP_SONG",
+                      state: {
+                        ...state,
+                        phase: "countdown",
+                        countdown: 3,
+                        seconds: 0,
+                        duration: 0,
+                        playing: false,
+                        titleGuess: "",
+                        artistGuess: "",
+                        correct: null,
+                        tokens: state.tokens - 1,
+                        drawnSong: nextSong,
+                        usedSongIds: [...state.usedSongIds, nextSong.id],
+                        round: state.round + 1,
+                      },
+                    });
                   }}
+                disabled={state.tokens < 1}
+                title="Spend 1 token to skip this song"
                 >
-                  Skip song <span>↗</span>
+                  Skip song · 1 token <span>↗</span>
                 </button>
 
                 <button
@@ -752,12 +773,49 @@ export default function App() {
               : "Keep the song in mind. Now guess where it belongs."}
           </p>
 
-          <button
-            className="lock-button"
-            onClick={() => dispatch({ type: "CONTINUE" })}
-          >
-            Place on timeline <span>↗</span>
-          </button>
+          <div className="reveal-actions">
+            <button
+              className="lock-button"
+              onClick={() => dispatch({ type: "CONTINUE" })}
+            >
+              Place on timeline <span>↗</span>
+            </button>
+            <button
+              className="text-control direct-claim"
+              disabled={state.tokens < 3}
+              onClick={() => {
+                const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
+                const nextTimeline = [...state.timeline];
+                const insertionIndex = getCorrectInsertionIndex(state.drawnSong, nextTimeline);
+                nextTimeline.splice(insertionIndex, 0, state.drawnSong);
+                if (!nextSong) {
+                  dispatch({ type: "DIRECT_CLAIM", state: { ...state, phase: "placement", timeline: nextTimeline, tokens: state.tokens - 3 } });
+                  return;
+                }
+                dispatch({
+                  type: "DIRECT_CLAIM",
+                  state: {
+                    ...state,
+                    phase: "countdown",
+                    countdown: 3,
+                    seconds: 0,
+                    duration: 0,
+                    playing: false,
+                    titleGuess: "",
+                    artistGuess: "",
+                    correct: null,
+                    tokens: state.tokens - 3,
+                    timeline: nextTimeline,
+                    drawnSong: nextSong,
+                    usedSongIds: [...state.usedSongIds, nextSong.id],
+                    round: state.round + 1,
+                  },
+                });
+              }}
+            >
+              Claim song · 3 tokens <span>✦</span>
+            </button>
+          </div>
         </section>
       )}
 
