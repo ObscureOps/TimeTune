@@ -113,7 +113,7 @@ export default function TimelinePlacement({
       const nextTimeline = [...timeline];
       nextTimeline.splice(lockedSlot, 0, drawnSong);
       setTimeline(nextTimeline);
-      onPlacementResult(nextTimeline);
+      onPlacementResult(initialTimeline.length === 0 ? [drawnSong] : nextTimeline);
     }
   }
 
