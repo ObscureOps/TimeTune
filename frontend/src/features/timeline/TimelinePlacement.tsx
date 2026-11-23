@@ -11,7 +11,7 @@ type Props = {
   timeline: Song[];
   round: number;
   onPlacementResult: (timeline: Song[]) => void;
-  onNextRound: (outcome?: { ownerIndex: number; timeline: Song[]; stealerIndex?: number }) => void;
+  onNextRound: (outcome?: { ownerIndex?: number; timeline?: Song[]; stealerIndex?: number }) => void;
   onRestart: () => void;
   tokens: number;
   onSpendToken: () => void;
@@ -169,12 +169,20 @@ export default function TimelinePlacement({
   }
 
   function continueGame() {
-    if (stealResult === true && selectedStealer !== null) {
-      const officialTimeline = playerTimelines[selectedStealer] ?? [];
-      const nextTimeline = [...officialTimeline];
-      if (nextTimeline.length === 0) nextTimeline.push(drawnSong);
-      else nextTimeline.splice(stealSlot ?? nextTimeline.length, 0, drawnSong);
-      onNextRound({ ownerIndex: selectedStealer, timeline: nextTimeline, stealerIndex: selectedStealer });
+    if (stealResult !== null && selectedStealer !== null) {
+      if (stealResult === true) {
+        const officialTimeline = playerTimelines[selectedStealer] ?? [];
+        const nextTimeline = [...officialTimeline];
+        if (nextTimeline.length === 0) nextTimeline.push(drawnSong);
+        else nextTimeline.splice(stealSlot ?? nextTimeline.length, 0, drawnSong);
+        onNextRound({ ownerIndex: selectedStealer, timeline: nextTimeline, stealerIndex: selectedStealer });
+        return;
+      }
+      if (result === "correct") {
+        onNextRound({ ownerIndex: currentPlayerIndex, timeline: initialTimeline.length === 0 ? [drawnSong] : timeline, stealerIndex: selectedStealer });
+      } else {
+        onNextRound({ stealerIndex: selectedStealer });
+      }
       return;
     }
     if (result === "correct") {
