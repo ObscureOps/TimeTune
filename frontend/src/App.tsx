@@ -44,6 +44,7 @@ type Action =
   | { type: "LOCK_GUESS" }
   | { type: "CONTINUE" }
   | { type: "PLACEMENT_RESULT"; timeline: Song[] }
+  | { type: "SPEND_TOKEN" }
   | { type: "NEXT_ROUND"; state: GameState }
   | { type: "RESET"; state: GameState };
 
@@ -205,6 +206,9 @@ function reducer(state: GameState, action: Action): GameState {
 
     case "PLACEMENT_RESULT":
       return { ...state, timeline: action.timeline };
+
+    case "SPEND_TOKEN":
+      return { ...state, tokens: Math.max(0, state.tokens - 1) };
 
     case "NEXT_ROUND":
       return action.state;
@@ -780,6 +784,8 @@ export default function App() {
           drawnSong={state.drawnSong}
           timeline={state.timeline}
           round={state.round}
+          tokens={state.tokens}
+          onSpendToken={() => dispatch({ type: "SPEND_TOKEN" })}
           onPlacementResult={(nextTimeline) => dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline })}
           onNextRound={() => {
             const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
