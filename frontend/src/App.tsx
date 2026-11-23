@@ -824,7 +824,9 @@ export default function App() {
             // Use the resolved outcome directly: queued React updates from placement
             // callbacks may not be visible yet when this handler advances the round.
             const savedTimelines = localTimelines.map((timeline, index) =>
-              outcome?.ownerIndex === index ? outcome.timeline : timeline
+              outcome?.ownerIndex === index && outcome.timeline
+                ? outcome.timeline
+                : timeline ?? []
             );
             const savedBalances = localTokenBalances.map((balance, index) => {
               if (index === localPlayerIndex) return state.tokens;
@@ -836,7 +838,7 @@ export default function App() {
             const winnerIndex = savedTimelines.findIndex((timeline) => timeline.length >= 10);
             if (winnerIndex >= 0) {
               setLocalPlayerIndex(winnerIndex);
-              dispatch({ type: "NEXT_ROUND", state: { ...state, tokens: savedBalances[winnerIndex] ?? 0, timeline: savedTimelines[winnerIndex], phase: "won" } });
+              dispatch({ type: "NEXT_ROUND", state: { ...state, tokens: savedBalances[winnerIndex] ?? 0, timeline: savedTimelines[winnerIndex] ?? [], phase: "won" } });
               return;
             }
             const nextPlayerIndex = (localPlayerIndex + 1) % localPlayers.length;
