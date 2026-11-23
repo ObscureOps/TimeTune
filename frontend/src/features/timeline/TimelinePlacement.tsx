@@ -18,7 +18,9 @@ type Props = {
   localPlayers: string[];
   currentPlayerIndex: number;
   playerTokens: number[];
+  playerTimelines: Song[][];
   onStealSelected: (playerIndex: number) => void;
+  onStealPlacementResult: (playerIndex: number, timeline: Song[]) => void;
 };
 
 export default function TimelinePlacement({
@@ -34,7 +36,9 @@ export default function TimelinePlacement({
   localPlayers,
   currentPlayerIndex,
   playerTokens,
+  playerTimelines,
   onStealSelected,
+  onStealPlacementResult,
 }: Props) {
   const [timeline, setTimeline] = useState<Song[]>(
     initialTimeline.length > 0 ? initialTimeline : [startingSong],
@@ -57,7 +61,11 @@ export default function TimelinePlacement({
   const [stealResult, setStealResult] = useState<boolean | null>(null);
   const [selectedStealer, setSelectedStealer] = useState<number | null>(null);
 
-  const slots = timeline.length + 1;
+  const rebattleTimeline = selectedStealer !== null && (playerTimelines[selectedStealer]?.length ?? 0) > 0
+    ? playerTimelines[selectedStealer]
+    : [startingSong];
+  const displayTimeline = stealMode ? rebattleTimeline : timeline;
+  const slots = displayTimeline.length + 1;
 
   function selectSlot(slotIndex: number) {
     if (revealed || lockedSlot !== null) return;
@@ -139,7 +147,7 @@ export default function TimelinePlacement({
   function resolveSteal() {
     if (stealSlot === null || lockedSlot === null) return;
     const originalCorrect = isCorrectPlacement(drawnSong, timeline, lockedSlot);
-    const stealCorrect = !originalCorrect && isCorrectPlacement(drawnSong, timeline, stealSlot);
+    const stealCorrect = !originalCorrect && selectedStealer !== null && isCorrectPlacement(drawnSong, rebattleTimeline, stealSlot);
     setStealResult(stealCorrect);
     setRevealed(true);
     setResult(originalCorrect ? "correct" : "incorrect");
@@ -147,7 +155,16 @@ export default function TimelinePlacement({
       const nextTimeline = [...timeline];
       nextTimeline.splice(lockedSlot, 0, drawnSong);
       setTimeline(nextTimeline);
-      onPlacementResult(nextTimeline);
+      onPlacementResult(initialTimeline.length === 0 ? [drawnSong] : nextTimeline);
+    } else if (stealCorrect && selectedStealer !== null) {
+      const stealerOfficialTimeline = playerTimelines[selectedStealer] ?? [];
+      const nextStealerTimeline = [...stealerOfficialTimeline];
+      if (nextStealerTimeline.length === 0) {
+        nextStealerTimeline.push(drawnSong);
+      } else {
+        nextStealerTimeline.splice(stealSlot, 0, drawnSong);
+      }
+      onStealPlacementResult(selectedStealer, nextStealerTimeline);
     }
   }
 
@@ -227,9 +244,9 @@ export default function TimelinePlacement({
         </div>
 
         <div className="timeline-round">
-          <span>YOUR TIMELINE</span>
+          <span>{stealMode && selectedStealer !== null ? `${localPlayers[selectedStealer] ?? "STEALER"}'S TIMELINE` : "YOUR TIMELINE"}</span>
           <strong>
-            {timeline.length} {timeline.length === 1 ? "CARD" : "CARDS"}
+            {displayTimeline.length} {displayTimeline.length === 1 ? "CARD" : "CARDS"}
           </strong>
         </div>
       </header>
@@ -297,8 +314,8 @@ export default function TimelinePlacement({
                   </span>
                 </button>
 
-                {slotIndex < timeline.length && (
-                  <TimelineCard card={timeline[slotIndex]} />
+                {slotIndex < displayTimeline.length && (
+                  <TimelineCard card={displayTimeline[slotIndex]} />
                 )}
               </div>
             );
@@ -425,12 +442,12 @@ export default function TimelinePlacement({
           <div className="verdict-main">
             <span className="verdict-mark">{stealResult === true ? "↗" : stealResult === false ? "×" : result === "correct" ? "✓" : "×"}</span>
             <div className="verdict-copy">
-              <p className="verdict-kicker">{stealResult !== null ? "STEAL ATTEMPT" : "PLACEMENT"}</p>
-              <h2>{stealResult !== null ? (stealResult ? "Card stolen." : "No one takes it.") : result === "correct" ? "In the right place." : "Out of time."}</h2>
-              <p>{stealResult !== null ? (stealResult ? "The active player missed. The stealer's placement was right—the card changes hands." : result === "correct" ? "The active player had it right. Their card stays; the steal chip is spent." : "Both placements missed. The card is discarded, and the steal chip is spent.") : result === "correct" ? "The card joins the active player's timeline." : "The placement missed. This card is discarded."}</p>
+              <p className="verdict-kicker">{stealResult !== null ? `STEAL ATTEMPT · ${localPlayers[selectedStealer ?? -1] ?? "PLAYER"}` : "PLACEMENT"}</p>
+              <h2>{stealResult !== null ? (stealResult ? "Card stolen." : result === "correct" ? "Card defended." : "No one takes it.") : result === "correct" ? "In the right place." : "Out of time."}</h2>
+              <p>{stealResult !== null ? (stealResult ? `${localPlayers[selectedStealer ?? -1] ?? "The stealer"} placed it correctly on their timeline. The active player's placement was wrong, so ownership transfers.` : result === "correct" ? "The active player placed it correctly. Their card stays; the steal chip is spent." : "Both placements were wrong. The card is discarded, and the steal chip is spent.") : result === "correct" ? "The card joins the active player's timeline." : "The placement missed. This card is discarded."}</p>
             </div>
           </div>
-          <div className="verdict-footer"><span>{stealResult === true ? "CARD → STEALER" : stealResult === false ? result === "correct" ? "CARD → ACTIVE PLAYER" : "CARD → DISCARD" : result === "correct" ? "CARD → TIMELINE" : "CARD → DISCARD"}</span><button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button></div>
+          <div className="verdict-footer"><span>{stealResult === true ? `CARD → ${localPlayers[selectedStealer ?? -1] ?? "STEALER"}` : stealResult === false ? result === "correct" ? "CARD → ACTIVE PLAYER" : "CARD → DISCARD" : result === "correct" ? "CARD → TIMELINE" : "CARD → DISCARD"}</span><button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button></div>
         </div>
       )}
     </section>
