@@ -30,7 +30,7 @@ Last updated: 2026-11-23
 
 ## In progress
 
-- Local Mode setup — player lobby screen is being added; this is the first implementation step toward shared-device turn flow.
+- Local Mode — lobby, rotating active-player indicator, per-player chip balances, individual timeline persistence between turns, and player selection in the steal window are implemented. Steal picker excludes the current player and disables players with zero chips. Reveal feedback now labels steal success/failure and explains the result. Full rebattle ownership transfer is still pending.
 
 
 - Player reliability — `frontend/src/features/player/YouTubePlayer.tsx`
@@ -43,7 +43,7 @@ Last updated: 2026-11-23
 
 ## Next up
 
-1. Implement Local Mode turn handoff and per-player timelines/token banks.
+1. Complete local steal rebattle against the selected player's timeline and transfer card ownership.
 2. Test local lobby and game flow (`npm run build`).
 2. Replace `YouTubePlayer.tsx` with the improved implementation.
 2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
@@ -74,16 +74,16 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.8a — Local Mode lobby foundation
+Milestone 2.8b — Local turn state and steal selection
 
-Status: Lobby component added and integrated; local build/test not run.
+Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/features/local/LocalLobby.tsx` — configurable 2–8 player name setup and start action.
-- `frontend/src/features/local/LocalLobby.css` — responsive lobby styling.
-- `frontend/src/App.tsx` — app now enters through the Local Mode lobby.
+- `frontend/src/App.tsx` — tracks active player, rotates turns, preserves player chip balances and timelines between turns, and shows active player in the top bar.
+- `frontend/src/features/timeline/TimelinePlacement.tsx` — steal window presents a player picker. Current player is excluded; players with no chips are disabled; choosing a stealer commits the chip and opens rebattle placement. Reveal feedback identifies steal success/failure.
+- `frontend/src/features/timeline/TimelinePlacement.css` — picker and reveal result styles.
 
-Next: implement active-player turn handoff, individual timelines and token banks, then local steal resolution.
+Limitations: selected stealer's timeline is not yet loaded for rebattle, and a successful steal does not yet transfer the official card into that player's timeline. This milestone establishes selection and local turn state; ownership resolution remains next.
 
 ## Previous milestone
 
