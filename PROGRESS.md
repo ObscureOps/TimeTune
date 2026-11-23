@@ -14,7 +14,7 @@ Last updated: 2026-11-24
 - Guessing phase — `frontend/src/App.tsx` — song title and artist inputs.
 - Reveal phase — `frontend/src/App.tsx` — displays song details and guess result.
 - Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface, chronological timeline, and timeline carry-forward between rounds.
-- Placement lock and steal window — `frontend/src/features/timeline/TimelinePlacement.tsx` — player locks their slot before a pass/reveal or simulated steal rebattle; steal costs one token and correct placements cannot be stolen. The current solo simulation does not yet transfer ownership to a second player's timeline.
+- Placement lock and steal window — `frontend/src/features/timeline/TimelinePlacement.tsx` — local player locks their slot before the steal window; opponents can rebattle on their own timelines, with ownership transfer and chip cost resolved.
 - Multi-round gameplay state — `frontend/src/App.tsx` — tracks round number, used songs, official timeline, and draws the next unused configured song after placement.
 - Token actions — `frontend/src/App.tsx` — skip song for 1 token and direct chronological claim for 3 tokens, with round progression and timeline carry-forward.
 - Ten-card win condition — `frontend/src/App.tsx` — correct placements and direct claims trigger a victory screen when the official timeline reaches 10 cards.
@@ -110,4 +110,4 @@ Note: Steal mechanics are deferred until player/opponent state and multiplayer t
 
 ## Next milestone
 
-Milestone 3.1 — Frontend gameplay QA, edge-case fixes, and local save/resume
+Milestone 3.2 — Local Mode QA, save/resume, and remaining edge-case fixes
