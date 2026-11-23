@@ -1,3 +1,13 @@
 package com.timetune.service;
 import com.timetune.domain.*;import org.springframework.stereotype.Service;import java.util.*;
-@Service public class SongSelectionService {private final SongCatalogService catalog;public SongSelectionService(SongCatalogService c){catalog=c;}public Song unused(GameSession s){Set<UUID> used=new HashSet<>(s.getUsedSongIds());List<Song> pool=catalog.all().stream().filter(x->!used.contains(x.getId())).toList();if(pool.isEmpty())throw new IllegalStateException("No unused songs remain");return pool.get(new Random().nextInt(pool.size()));}public Song reference(Set<UUID> exclude){List<Song> pool=catalog.all().stream().filter(x->!exclude.contains(x.getId())).toList();if(pool.isEmpty())throw new IllegalStateException("No reference songs available");return pool.get(new Random().nextInt(pool.size()));}}
+@Service public class SongSelectionService {
+ private final SongCatalogService catalog;public SongSelectionService(SongCatalogService c){catalog=c;}
+ public Song unused(GameSession s){
+  Set<UUID> used=new HashSet<>(s.getUsedSongIds());
+  s.getPlayers().forEach(p->{Song reference=p.getTimeline().getTemporaryReference();if(reference!=null)used.add(reference.getId());});
+  List<Song> pool=catalog.all().stream().filter(x->!used.contains(x.getId())).toList();
+  if(pool.isEmpty())throw new IllegalStateException("No unused songs remain");
+  return pool.get(new Random().nextInt(pool.size()));
+ }
+ public Song reference(Set<UUID> exclude){List<Song> pool=catalog.all().stream().filter(x->!exclude.contains(x.getId())).toList();if(pool.isEmpty())throw new IllegalStateException("No reference songs available");return pool.get(new Random().nextInt(pool.size()));}
+}
