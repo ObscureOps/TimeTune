@@ -814,7 +814,6 @@ export default function App() {
           playerTokens={localTokenBalances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance)}
           playerTimelines={localTimelines}
           onStealPlacementResult={(playerIndex, nextTimeline) => setLocalTimelines((timelines) => timelines.map((timeline, index) => index === playerIndex ? nextTimeline : timeline))}
-          onStealSelected={(playerIndex) => setLocalTokenBalances((balances) => balances.map((balance, index) => index === playerIndex ? Math.max(0, balance - 1) : balance))}
           onPlacementResult={(nextTimeline) => { setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? nextTimeline : timeline)); dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline }); }}
           onNextRound={(outcome) => {
             const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
