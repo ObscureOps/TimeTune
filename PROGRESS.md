@@ -30,7 +30,7 @@ Last updated: 2026-11-24
 
 ## In progress
 
-- Local Mode — lobby, rotating active-player indicator, per-player chip balances and timelines, steal picker, rebattle on the selected player's timeline, successful card ownership transfer, pass-the-device handoff screen, and compact standings strip are implemented. Current player and chip-less players cannot steal.
+- Local Mode — lobby, rotating active-player indicator, per-player chip balances and timelines, steal picker, rebattle on the selected player's timeline, successful card ownership transfer, pass-the-device handoff screen, Current player and chip-less players cannot steal. The standings strip was removed from the gameplay header to keep the local interface focused.
 - Local round-resolution synchronization — fixed a stale React-state issue where the next-round callback could miss a card earned or transferred in the immediately preceding placement/steal. The resolved timeline is now passed directly into round advancement, and the steal chip cost is persisted for both successful and failed attempts. Temporary starting references are excluded from the official timeline outcome.
 
 - Player reliability — `frontend/src/features/player/YouTubePlayer.tsx`
