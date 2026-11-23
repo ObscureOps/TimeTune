@@ -819,14 +819,22 @@ export default function App() {
           onStealPlacementResult={(playerIndex, nextTimeline) => setLocalTimelines((timelines) => timelines.map((timeline, index) => index === playerIndex ? nextTimeline : timeline))}
           onStealSelected={(playerIndex) => setLocalTokenBalances((balances) => balances.map((balance, index) => index === playerIndex ? Math.max(0, balance - 1) : balance))}
           onPlacementResult={(nextTimeline) => { setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? nextTimeline : timeline)); dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline }); }}
-          onNextRound={() => {
+          onNextRound={(outcome) => {
             const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
             if (!nextSong) {
               restartGame();
               return;
             }
-            const savedBalances = localTokenBalances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance);
-            const savedTimelines = localTimelines.map((timeline, index) => index === localPlayerIndex ? state.timeline : timeline);
+            // Use the resolved outcome directly: queued React updates from placement
+            // callbacks may not be visible yet when this handler advances the round.
+            const savedTimelines = localTimelines.map((timeline, index) =>
+              outcome?.ownerIndex === index ? outcome.timeline : timeline
+            );
+            const savedBalances = localTokenBalances.map((balance, index) => {
+              if (index === localPlayerIndex) return state.tokens;
+              if (outcome?.stealerIndex === index) return Math.max(0, balance - 1);
+              return balance;
+            });
             setLocalTokenBalances(savedBalances);
             setLocalTimelines(savedTimelines);
             const winnerIndex = savedTimelines.findIndex((timeline) => timeline.length >= 10);
@@ -841,8 +849,8 @@ export default function App() {
               type: "NEXT_ROUND",
               state: {
                 ...state,
-                tokens: localTokenBalances[nextPlayerIndex] ?? 1,
-                timeline: localTimelines[nextPlayerIndex] ?? [],
+                tokens: savedBalances[nextPlayerIndex] ?? 1,
+                timeline: savedTimelines[nextPlayerIndex] ?? [],
                 phase: "handoff",
                 countdown: 3,
                 seconds: 0,
