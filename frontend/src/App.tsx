@@ -11,7 +11,8 @@ type Phase =
   | "listening"
   | "guessing"
   | "reveal"
-  | "placement";
+  | "placement"
+  | "won";
 
 type GameState = {
   phase: Phase;
@@ -297,7 +298,7 @@ export default function App() {
           <div className="power-up-heading"><span>POWER-UPS</span><button className="power-up-close" onClick={() => setPowerUpsOpen(false)} aria-label="Close">×</button></div><p className="power-up-subtitle">Spend your chips to change the turn.</p>
           <button className="power-up-action" disabled={state.tokens < 1 || !["listening","guessing"].includes(state.phase)} onClick={() => {playerControlsRef.current?.stop();const nextSong=getRandomUnusedSong(SONGS,state.usedSongIds);if(!nextSong)return;dispatch({type:"SKIP_SONG",state:{...state,phase:"countdown",countdown:3,seconds:0,duration:0,playing:false,titleGuess:"",artistGuess:"",correct:null,tokens:state.tokens-1,drawnSong:nextSong,usedSongIds:[...state.usedSongIds,nextSong.id],round:state.round+1}});setPowerUpsOpen(false);}}>
             <span className="power-up-name"><span className="action-mark">↻</span><span><strong>Skip song</strong><small>Draw a new track</small></span></span><span className="action-cost">1 CHIP</span></button>
-          <button className="power-up-action" disabled={state.tokens < 3 || !["listening","guessing"].includes(state.phase)} onClick={() => {playerControlsRef.current?.stop();const nextSong=getRandomUnusedSong(SONGS,state.usedSongIds);if(!nextSong)return;const nextTimeline=[...state.timeline];nextTimeline.splice(getCorrectInsertionIndex(state.drawnSong,nextTimeline),0,state.drawnSong);dispatch({type:"DIRECT_CLAIM",state:{...state,phase:"countdown",countdown:3,seconds:0,duration:0,playing:false,titleGuess:"",artistGuess:"",correct:null,tokens:state.tokens-3,timeline:nextTimeline,drawnSong:nextSong,usedSongIds:[...state.usedSongIds,nextSong.id],round:state.round+1}});setPowerUpsOpen(false);}}>
+          <button className="power-up-action" disabled={state.tokens < 3 || !["listening","guessing"].includes(state.phase)} onClick={() => {playerControlsRef.current?.stop();const nextSong=getRandomUnusedSong(SONGS,state.usedSongIds);if(!nextSong)return;const nextTimeline=[...state.timeline];nextTimeline.splice(getCorrectInsertionIndex(state.drawnSong,nextTimeline),0,state.drawnSong);dispatch({type:"DIRECT_CLAIM",state:{...state,phase:nextTimeline.length>=10?"won":"countdown",countdown:3,seconds:0,duration:0,playing:false,titleGuess:"",artistGuess:"",correct:null,tokens:state.tokens-3,timeline:nextTimeline,drawnSong:nextSong,usedSongIds:[...state.usedSongIds,nextSong.id],round:state.round+1}});setPowerUpsOpen(false);}}>
             <span className="power-up-name"><span className="action-mark">✦</span><span><strong>Direct claim</strong><small>Claim without placement risk</small></span></span><span className="action-cost">3 CHIPS</span></button><div className="power-up-footer">NAME BOTH TITLE + ARTIST TO EARN A CHIP</div></div>}
       </header>
 
@@ -790,7 +791,7 @@ export default function App() {
               type: "NEXT_ROUND",
               state: {
                 ...state,
-                phase: "countdown",
+                phase: state.timeline.length >= 10 ? "won" : "countdown",
                 countdown: 3,
                 seconds: 0,
                 duration: 0,
@@ -806,6 +807,23 @@ export default function App() {
           }}
           onRestart={restartGame}
         />
+      )}
+
+      {state.phase === "won" && (
+        <section className="reveal-stage correct">
+          <div className="reveal-mark">✓</div>
+          <p className="eyebrow">TIMELINE COMPLETE</p>
+          <h1>You did it.</h1>
+          <div className="revealed-song">
+            <span className="reveal-title">{state.timeline.length} OFFICIAL CARDS</span>
+            <span className="reveal-artist">You reached the 10-card victory goal.</span>
+          </div>
+          <div className="reveal-actions">
+            <button className="lock-button" onClick={restartGame}>
+              Play again <span>↻</span>
+            </button>
+          </div>
+        </section>
       )}
 
       <footer className="footer">
