@@ -242,6 +242,7 @@ export default function App() {
   const [localPlayers, setLocalPlayers] = useState<string[]>([]);
   const [localPlayerIndex, setLocalPlayerIndex] = useState(0);
   const [localTokenBalances, setLocalTokenBalances] = useState<number[]>([]);
+  const [localTimelines, setLocalTimelines] = useState<Song[][]>([]);
 
   useEffect(() => {
     if (state.phase !== "countdown") return;
@@ -288,7 +289,7 @@ export default function App() {
   const activeBarIndex = Math.floor((progress / 100) * WAVEFORM_HEIGHTS.length);
 
   if (showLocalLobby) {
-    return <LocalLobby onStart={(players) => { setLocalPlayers(players); setLocalTokenBalances(players.map(() => 1)); setLocalPlayerIndex(0); setShowLocalLobby(false); }} />;
+    return <LocalLobby onStart={(players) => { setLocalPlayers(players); setLocalTokenBalances(players.map(() => 1)); setLocalTimelines(players.map(() => [])); setLocalPlayerIndex(0); setShowLocalLobby(false); }} />;
   }
 
   return (
@@ -799,7 +800,7 @@ export default function App() {
           currentPlayerIndex={localPlayerIndex}
           playerTokens={localTokenBalances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance)}
           onStealSelected={(playerIndex) => setLocalTokenBalances((balances) => balances.map((balance, index) => index === playerIndex ? Math.max(0, balance - 1) : balance))}
-          onPlacementResult={(nextTimeline) => dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline })}
+          onPlacementResult={(nextTimeline) => { setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? nextTimeline : timeline)); dispatch({ type: "PLACEMENT_RESULT", timeline: nextTimeline }); }}
           onNextRound={() => {
             const nextSong = getRandomUnusedSong(SONGS, state.usedSongIds);
             if (!nextSong) {
@@ -808,12 +809,14 @@ export default function App() {
             }
             const nextPlayerIndex = (localPlayerIndex + 1) % localPlayers.length;
             setLocalTokenBalances((balances) => balances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance));
+            setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? state.timeline : timeline));
             setLocalPlayerIndex(nextPlayerIndex);
             dispatch({
               type: "NEXT_ROUND",
               state: {
                 ...state,
                 tokens: localTokenBalances[nextPlayerIndex] ?? 1,
+                timeline: localTimelines[nextPlayerIndex] ?? [],
                 phase: state.timeline.length >= 10 ? "won" : "countdown",
                 countdown: 3,
                 seconds: 0,
