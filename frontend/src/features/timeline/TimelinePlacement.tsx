@@ -8,17 +8,25 @@ type PlacementResult = "correct" | "incorrect" | null;
 type Props = {
   startingSong: Song;
   drawnSong: Song;
+  timeline: Song[];
+  round: number;
+  onPlacementResult: (timeline: Song[]) => void;
+  onNextRound: () => void;
   onRestart: () => void;
 };
 
 export default function TimelinePlacement({
   startingSong,
   drawnSong,
+  timeline: initialTimeline,
+  round,
+  onPlacementResult,
+  onNextRound,
   onRestart,
 }: Props) {
-  const [timeline, setTimeline] = useState<Song[]>([
-    startingSong,
-  ]);
+  const [timeline, setTimeline] = useState<Song[]>(
+    initialTimeline.length > 0 ? initialTimeline : [startingSong],
+  );
 
   const [selectedSlot, setSelectedSlot] = useState<number | null>(
     null,
@@ -101,11 +109,12 @@ export default function TimelinePlacement({
       nextTimeline.splice(selectedSlot, 0, drawnSong);
 
       setTimeline(nextTimeline);
+      onPlacementResult(initialTimeline.length === 0 ? [drawnSong] : nextTimeline);
     }
   }
 
   function continueGame() {
-    setCompleted(true);
+    onNextRound();
   }
 
   function resetPlacement() {
@@ -383,7 +392,7 @@ export default function TimelinePlacement({
             className="timeline-primary"
             onClick={continueGame}
           >
-            Continue <span>↗</span>
+            Next song <span>↗</span>
           </button>
         </div>
       )}
