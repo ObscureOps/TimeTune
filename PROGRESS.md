@@ -13,7 +13,8 @@ Last updated: 2026-11-23
 - Listening phase — `frontend/src/App.tsx` — music playback and waveform progress.
 - Guessing phase — `frontend/src/App.tsx` — song title and artist inputs.
 - Reveal phase — `frontend/src/App.tsx` — displays song details and guess result.
-- Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface and chronological timeline.
+- Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface, chronological timeline, and timeline carry-forward between rounds.
+- Multi-round gameplay state — `frontend/src/App.tsx` — tracks round number, used songs, official timeline, and draws the next unused configured song after placement.
 - Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, and placement phases.
 - Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
 - Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
@@ -35,7 +36,8 @@ Last updated: 2026-11-23
 
 ## Next up
 
-1. Replace `YouTubePlayer.tsx` with the improved implementation.
+1. Test persistent timeline and multi-round flow locally (`npm run build`).
+2. Replace `YouTubePlayer.tsx` with the improved implementation.
 2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
 3. Verify playback behavior when changing songs.
 4. Improve error messaging for unavailable or restricted videos.
@@ -64,13 +66,14 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.4 — Gameplay rules alignment
+Milestone 2.5 — Persistent timeline and multi-round gameplay
 
-Status: Initial rule correction committed to GitHub; local build/test not run.
+Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/App.tsx` — starting token bank changed from 2 to 1.
+- `frontend/src/App.tsx` — stores official timeline, round count, and used song IDs; draws the next unused configured song and resets the listening phases.
+- `frontend/src/features/timeline/TimelinePlacement.tsx` — accepts carried timeline state and reports successful placements to the game state. The initial reference song is used only for the first placement and is not carried into the official timeline.
 
 ## Next milestone
 
-Milestone 2.5 — Persistent timeline and multi-round gameplay
+Milestone 2.6 — Token actions and rule alignment
