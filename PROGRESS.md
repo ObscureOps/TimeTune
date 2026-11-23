@@ -15,6 +15,7 @@ Last updated: 2026-11-23
 - Reveal phase — `frontend/src/App.tsx` — displays song details and guess result.
 - Timeline placement — `frontend/src/features/timeline/TimelinePlacement.tsx` — placement interface and chronological timeline.
 - Game state reducer — `frontend/src/App.tsx` — countdown, listening, guessing, reveal, and placement phases.
+- Starting token correction — `frontend/src/App.tsx` — game begins with 1 token (confirmed rules).
 - Song dataset — `frontend/src/data/songs.json` — initial collection of 50 songs.
 - Song type — `frontend/src/types/song.ts` — shared song data interface.
 - Song selection — `frontend/src/utils/songUtils.ts` — random unused song selection.
@@ -63,14 +64,13 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.3 — Player reliability
+Milestone 2.4 — Gameplay rules alignment
 
-Status: Implementation provided; local testing pending.
+Status: Initial rule correction committed to GitHub; local build/test not run.
 
 Files:
-- `frontend/src/features/player/YouTubePlayer.tsx`
-- `frontend/src/features/player/YouTubePlayer.css`
+- `frontend/src/App.tsx` — starting token bank changed from 2 to 1.
 
 ## Next milestone
 
-Milestone 2.4 — Playback testing and song-data completion
+Milestone 2.5 — Persistent timeline and multi-round gameplay
