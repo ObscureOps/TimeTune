@@ -1,7 +1,7 @@
 
 # TimeTune — Progress
 
-Last updated: 2026-11-23
+Last updated: 2026-11-24
 
 ## Done
 
@@ -30,7 +30,7 @@ Last updated: 2026-11-23
 
 ## In progress
 
-- Local Mode — lobby, rotating active-player indicator, per-player chip balances, individual timeline persistence between turns, and player selection in the steal window are implemented. Steal picker excludes the current player and disables players with zero chips. Reveal feedback now labels steal success/failure and explains the result. Full rebattle ownership transfer is still pending.
+- Local Mode — lobby, rotating active-player indicator, per-player chip balances and timelines, steal picker, rebattle on the selected player's timeline, successful card ownership transfer, and pass-the-device handoff screen are implemented. Current player and chip-less players cannot steal. A compact standings strip tracks each player's official card count and chips. Victory is checked across local player timelines after round resolution.
 
 
 - Player reliability — `frontend/src/features/player/YouTubePlayer.tsx`
@@ -43,9 +43,9 @@ Last updated: 2026-11-23
 
 ## Next up
 
-1. Complete local steal rebattle against the selected player's timeline and transfer card ownership.
-2. Test local lobby and game flow (`npm run build`).
-2. Replace `YouTubePlayer.tsx` with the improved implementation.
+1. Run frontend build and test local lobby, handoff, timeline, steal transfer, and individual victory flow.
+2. Audit state synchronization and rule edge cases (direct claim, steal-win, reference-card handling).
+3. Replace `YouTubePlayer.tsx` with the improved implementation.
 2. Test API loading, player initialization, play, pause, replay, skip, and cleanup.
 3. Verify playback behavior when changing songs.
 4. Improve error messaging for unavailable or restricted videos.
@@ -74,16 +74,16 @@ Last updated: 2026-11-23
 
 ## Current milestone
 
-Milestone 2.8b — Local turn state and steal selection
+Milestone 3.0 — Local handoff, standings, and ownership-aware victory flow
 
 Status: Implemented in GitHub; local build/test not run.
 
 Files:
-- `frontend/src/App.tsx` — tracks active player, rotates turns, preserves player chip balances and timelines between turns, and shows active player in the top bar.
-- `frontend/src/features/timeline/TimelinePlacement.tsx` — steal window presents a player picker. Current player is excluded; players with no chips are disabled; choosing a stealer commits the chip and opens rebattle placement. Reveal feedback identifies steal success/failure.
-- `frontend/src/features/timeline/TimelinePlacement.css` — picker and reveal result styles.
+- `frontend/src/App.tsx` — adds a concealed-song handoff screen between local turns, a next-player readiness button, per-player standings, syncs direct claims into the local timeline, and checks all local timelines for the 10-card victory condition at round transition.
+- `frontend/src/index.css` — styles the standings strip and handoff screen responsively.
+- `frontend/src/features/timeline/TimelinePlacement.tsx` — rebattle uses the selected player's timeline; successful steals transfer the official card; original player keeps a correct placement; both wrong means discard.
 
-Limitations: selected stealer's timeline is not yet loaded for rebattle, and a successful steal does not yet transfer the official card into that player's timeline. This milestone establishes selection and local turn state; ownership resolution remains next.
+Remaining verification: run build/tests and manually check handoff privacy, direct claim score sync, chip sync, empty timeline rebattle, and a steal that puts a player at 10 cards. Local-only implementation; online multiplayer requires backend/server authority.
 
 ## Previous milestone
 
@@ -111,4 +111,4 @@ Note: Steal mechanics are deferred until player/opponent state and multiplayer t
 
 ## Next milestone
 
-Milestone 2.7c — Persistent player timelines and opponent ownership
+Milestone 3.1 — Frontend gameplay QA, edge-case fixes, and local save/resume
