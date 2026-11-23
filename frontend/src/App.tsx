@@ -9,6 +9,7 @@ import LocalLobby from "./features/local/LocalLobby";
 
 type Phase =
   | "countdown"
+  | "handoff"
   | "listening"
   | "guessing"
   | "reveal"
@@ -34,6 +35,7 @@ type GameState = {
 
 type Action =
   | { type: "TICK_COUNTDOWN" }
+  | { type: "START_NEXT_TURN" }
   | { type: "SET_PLAYBACK"; state: PlaybackState }
   | { type: "SET_PROGRESS"; seconds: number; duration: number }
   | { type: "OPEN_GUESS" }
@@ -112,6 +114,9 @@ function isArtistCorrect(guess: string, artist: string): boolean {
 
 function reducer(state: GameState, action: Action): GameState {
   switch (action.type) {
+    case "START_NEXT_TURN":
+      return { ...state, phase: "countdown", countdown: 3, playing: false, seconds: 0, duration: 0 };
+
     case "TICK_COUNTDOWN":
       if (state.countdown <= 1) {
         return {
@@ -304,6 +309,9 @@ export default function App() {
           <span className="live-dot" />
           ROUND {String(state.round).padStart(2, "0")} · {localPlayers[localPlayerIndex] ?? "PLAYER"}
         </div>
+        <div className="local-scoreboard" aria-label="Local player standings">
+          {localPlayers.map((player, index) => <span key={index} className={index === localPlayerIndex ? "scoreboard-player active" : "scoreboard-player"}><strong>{player}</strong><small>{localTimelines[index]?.length ?? 0}/10 · {index === localPlayerIndex ? state.tokens : localTokenBalances[index] ?? 1} chips</small></span>)}
+        </div>
 
         <button className={`token-counter chip-level-${state.tokens}`} aria-label={`Open power-ups. ${state.tokens} tokens`} aria-expanded={powerUpsOpen} onClick={() => setPowerUpsOpen((open) => !open)}>
           <span className="token-chip" aria-hidden="true"><span className="chip-inner">{state.tokens}</span></span><strong>{state.tokens}</strong><span className="token-label">POWER-UPS</span>
@@ -315,6 +323,16 @@ export default function App() {
           <button className="power-up-action" disabled={state.tokens < 3 || !["listening","guessing"].includes(state.phase)} onClick={() => {playerControlsRef.current?.stop();const nextSong=getRandomUnusedSong(SONGS,state.usedSongIds);if(!nextSong)return;const nextTimeline=[...state.timeline];nextTimeline.splice(getCorrectInsertionIndex(state.drawnSong,nextTimeline),0,state.drawnSong);dispatch({type:"DIRECT_CLAIM",state:{...state,phase:nextTimeline.length>=10?"won":"countdown",countdown:3,seconds:0,duration:0,playing:false,titleGuess:"",artistGuess:"",correct:null,tokens:state.tokens-3,timeline:nextTimeline,drawnSong:nextSong,usedSongIds:[...state.usedSongIds,nextSong.id],round:state.round+1}});setPowerUpsOpen(false);}}>
             <span className="power-up-name"><span className="action-mark">✦</span><span><strong>Direct claim</strong><small>Claim without placement risk</small></span></span><span className="action-cost">3 CHIPS</span></button><div className="power-up-footer">NAME BOTH TITLE + ARTIST TO EARN A CHIP</div></div>}
       </header>
+
+      {state.phase === "handoff" && (
+        <section className="countdown-stage handoff-stage" aria-live="polite">
+          <p className="eyebrow">LOCAL GAME · PASS THE DEVICE</p>
+          <div className="count-number">↗</div>
+          <h1>Pass to {localPlayers[localPlayerIndex] ?? "the next player"}.</h1>
+          <p className="count-caption">Keep the song hidden. Start when they are ready.</p>
+          <button className="lock-button" onClick={() => dispatch({ type: "START_NEXT_TURN" })}>Ready to listen <span>↗</span></button>
+        </section>
+      )}
 
       {state.phase === "countdown" && (
         <section className="countdown-stage" aria-live="polite">
@@ -807,9 +825,13 @@ export default function App() {
               restartGame();
               return;
             }
-            const nextPlayerIndex = (localPlayerIndex + 1) % localPlayers.length;
             setLocalTokenBalances((balances) => balances.map((balance, index) => index === localPlayerIndex ? state.tokens : balance));
             setLocalTimelines((timelines) => timelines.map((timeline, index) => index === localPlayerIndex ? state.timeline : timeline));
+            if (state.timeline.length >= 10) {
+              dispatch({ type: "NEXT_ROUND", state: { ...state, phase: "won" } });
+              return;
+            }
+            const nextPlayerIndex = (localPlayerIndex + 1) % localPlayers.length;
             setLocalPlayerIndex(nextPlayerIndex);
             dispatch({
               type: "NEXT_ROUND",
@@ -817,7 +839,7 @@ export default function App() {
                 ...state,
                 tokens: localTokenBalances[nextPlayerIndex] ?? 1,
                 timeline: localTimelines[nextPlayerIndex] ?? [],
-                phase: state.timeline.length >= 10 ? "won" : "countdown",
+                phase: "handoff",
                 countdown: 3,
                 seconds: 0,
                 duration: 0,
@@ -839,10 +861,10 @@ export default function App() {
         <section className="reveal-stage correct">
           <div className="reveal-mark">✓</div>
           <p className="eyebrow">TIMELINE COMPLETE</p>
-          <h1>You did it.</h1>
+          <h1>{localPlayers[localPlayerIndex] ?? "Player"} wins!</h1>
           <div className="revealed-song">
             <span className="reveal-title">{state.timeline.length} OFFICIAL CARDS</span>
-            <span className="reveal-artist">You reached the 10-card victory goal.</span>
+            <span className="reveal-artist">{localPlayers[localPlayerIndex] ?? "Player"} reached the 10-card victory goal.</span>
           </div>
           <div className="reveal-actions">
             <button className="lock-button" onClick={restartGame}>
