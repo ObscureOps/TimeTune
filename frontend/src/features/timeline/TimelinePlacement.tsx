@@ -19,7 +19,6 @@ type Props = {
   currentPlayerIndex: number;
   playerTokens: number[];
   playerTimelines: Song[][];
-  onStealSelected: (playerIndex: number) => void;
   onStealPlacementResult: (playerIndex: number, timeline: Song[]) => void;
 };
 
@@ -37,7 +36,6 @@ export default function TimelinePlacement({
   currentPlayerIndex,
   playerTokens,
   playerTimelines,
-  onStealSelected,
   onStealPlacementResult,
 }: Props) {
   const [timeline, setTimeline] = useState<Song[]>(
