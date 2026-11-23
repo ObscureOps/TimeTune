@@ -5,6 +5,7 @@ import songs from "./data/songs.json";
 import type { Song } from "./types/song";
 import { getRandomUnusedSong, getCorrectInsertionIndex } from "./utils/songUtils";
 import TimelinePlacement from "./features/timeline/TimelinePlacement";
+import LocalLobby from "./features/local/LocalLobby";
 
 type Phase =
   | "countdown"
@@ -237,6 +238,8 @@ export default function App() {
   const playerControlsRef = useRef<YouTubePlayerControls | null>(null);
   const [playbackError, setPlaybackError] = useState<string | null>(null);
   const [powerUpsOpen, setPowerUpsOpen] = useState(false);
+  const [showLocalLobby, setShowLocalLobby] = useState(true);
+  const [localPlayers, setLocalPlayers] = useState<string[]>([]);
 
   useEffect(() => {
     if (state.phase !== "countdown") return;
@@ -281,6 +284,10 @@ export default function App() {
   const progress = state.duration > 0 ? (state.seconds / state.duration) * 100 : 0;
 
   const activeBarIndex = Math.floor((progress / 100) * WAVEFORM_HEIGHTS.length);
+
+  if (showLocalLobby) {
+    return <LocalLobby onStart={(players) => { setLocalPlayers(players); setShowLocalLobby(false); }} />;
+  }
 
   return (
     <main className="app-shell">
