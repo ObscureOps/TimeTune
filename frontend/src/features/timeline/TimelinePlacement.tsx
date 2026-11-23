@@ -13,6 +13,8 @@ type Props = {
   onPlacementResult: (timeline: Song[]) => void;
   onNextRound: () => void;
   onRestart: () => void;
+  tokens: number;
+  onSpendToken: () => void;
 };
 
 export default function TimelinePlacement({
@@ -23,6 +25,8 @@ export default function TimelinePlacement({
   onPlacementResult,
   onNextRound,
   onRestart,
+  tokens,
+  onSpendToken,
 }: Props) {
   const [timeline, setTimeline] = useState<Song[]>(
     initialTimeline.length > 0 ? initialTimeline : [startingSong],
@@ -39,11 +43,15 @@ export default function TimelinePlacement({
   const [revealed, setRevealed] = useState(false);
   const [result, setResult] = useState<PlacementResult>(null);
   const [completed, setCompleted] = useState(false);
+  const [lockedSlot, setLockedSlot] = useState<number | null>(null);
+  const [stealMode, setStealMode] = useState(false);
+  const [stealSlot, setStealSlot] = useState<number | null>(null);
+  const [stealResult, setStealResult] = useState<boolean | null>(null);
 
   const slots = timeline.length + 1;
 
   function selectSlot(slotIndex: number) {
-    if (revealed) return;
+    if (revealed || lockedSlot !== null) return;
 
     setSelectedSlot(slotIndex);
     setDragOverSlot(null);
@@ -52,7 +60,7 @@ export default function TimelinePlacement({
   function handleDragStart(
     event: React.DragEvent<HTMLDivElement>,
   ) {
-    if (revealed) {
+    if (revealed || lockedSlot !== null) {
       event.preventDefault();
       return;
     }
@@ -92,24 +100,42 @@ export default function TimelinePlacement({
   }
 
   function commitPlacement() {
-    if (selectedSlot === null || revealed) return;
+    if (selectedSlot === null || revealed || lockedSlot !== null) return;
+    setLockedSlot(selectedSlot);
+  }
 
-    const correct = isCorrectPlacement(
-      drawnSong,
-      timeline,
-      selectedSlot,
-    );
-
+  function resolveWithoutSteal() {
+    if (lockedSlot === null) return;
+    const correct = isCorrectPlacement(drawnSong, timeline, lockedSlot);
     setRevealed(true);
     setResult(correct ? "correct" : "incorrect");
-
     if (correct) {
       const nextTimeline = [...timeline];
-
-      nextTimeline.splice(selectedSlot, 0, drawnSong);
-
+      nextTimeline.splice(lockedSlot, 0, drawnSong);
       setTimeline(nextTimeline);
-      onPlacementResult(initialTimeline.length === 0 ? [drawnSong] : nextTimeline);
+      onPlacementResult(nextTimeline);
+    }
+  }
+
+  function beginSimulatedSteal() {
+    if (tokens < 1 || lockedSlot === null) return;
+    onSpendToken();
+    setStealMode(true);
+    setStealSlot(null);
+  }
+
+  function resolveSteal() {
+    if (stealSlot === null || lockedSlot === null) return;
+    const originalCorrect = isCorrectPlacement(drawnSong, timeline, lockedSlot);
+    const stealCorrect = isCorrectPlacement(drawnSong, timeline, stealSlot);
+    setStealResult(stealCorrect);
+    setRevealed(true);
+    setResult(originalCorrect ? "correct" : "incorrect");
+    if (originalCorrect) {
+      const nextTimeline = [...timeline];
+      nextTimeline.splice(lockedSlot, 0, drawnSong);
+      setTimeline(nextTimeline);
+      onPlacementResult(nextTimeline);
     }
   }
 
@@ -124,6 +150,10 @@ export default function TimelinePlacement({
     setRevealed(false);
     setResult(null);
     setCompleted(false);
+    setLockedSlot(null);
+    setStealMode(false);
+    setStealSlot(null);
+    setStealResult(null);
   }
 
   if (completed) {
@@ -223,7 +253,7 @@ export default function TimelinePlacement({
                   } ${
                     isDragOver ? "drag-over" : ""
                   } ${revealed ? "locked" : ""}`}
-                  onClick={() => selectSlot(slotIndex)}
+                  onClick={() => stealMode ? setStealSlot(slotIndex) : selectSlot(slotIndex)}
                   onDragOver={(event) =>
                     handleDragOver(event, slotIndex)
                   }
@@ -235,7 +265,7 @@ export default function TimelinePlacement({
                   onDrop={(event) =>
                     handleDrop(event, slotIndex)
                   }
-                  disabled={revealed}
+                  disabled={revealed || (lockedSlot !== null && !stealMode)}
                   aria-label={`Place song at position ${
                     slotIndex + 1
                   }`}
@@ -267,9 +297,7 @@ export default function TimelinePlacement({
           <span className="instruction-line" />
 
           <span>
-            {revealed
-              ? "CARD REVEALED"
-              : "DRAG THE CARD INTO YOUR TIMELINE"}
+            {revealed ? "CARD REVEALED" : stealMode ? "SIMULATED STEAL · CHOOSE REBATTLE SLOT" : lockedSlot !== null ? "PLACEMENT LOCKED · STEAL WINDOW" : "DRAG THE MYSTERY CARD INTO YOUR TIMELINE"}
           </span>
 
           <span className="instruction-line" />
@@ -283,7 +311,7 @@ export default function TimelinePlacement({
               ? "card-selected"
               : ""
           }`}
-          draggable={!revealed}
+          draggable={!revealed && lockedSlot === null && !stealMode}
           onDragStart={handleDragStart}
           onDragEnd={() => setDragOverSlot(null)}
           role="group"
@@ -350,50 +378,35 @@ export default function TimelinePlacement({
         </div>
       </div>
 
-      {!revealed ? (
+      {!revealed && lockedSlot === null ? (
         <div className="timeline-actions">
-          <button
-            className="timeline-primary"
-            disabled={selectedSlot === null}
-            onClick={commitPlacement}
-          >
-            Lock placement <span>↗</span>
-          </button>
-
-          <p className="timeline-action-hint">
-            {selectedSlot === null
-              ? "Drag the card to a position, or tap a slot."
-              : "Placement locked in once you commit."}
-          </p>
+          <button className="timeline-primary" disabled={selectedSlot === null} onClick={commitPlacement}>Lock placement <span>↗</span></button>
+          <p className="timeline-action-hint">Placement locks before the steal window.</p>
+        </div>
+      ) : !revealed && !stealMode ? (
+        <div className="timeline-feedback steal-window">
+          <div className="feedback-heading"><span className="feedback-icon">!</span><div><strong>Steal window open</strong><span>First commitment wins. This solo prototype simulates an opponent's rebattle.</span></div></div>
+          <div className="steal-actions">
+            <button className="timeline-primary" onClick={resolveWithoutSteal}>Pass · reveal <span>↗</span></button>
+            <button className="timeline-secondary steal-button" disabled={tokens < 1} onClick={beginSimulatedSteal}>Simulate steal · 1 chip</button>
+          </div>
+        </div>
+      ) : !revealed && stealMode ? (
+        <div className="timeline-actions">
+          <p className="timeline-action-hint">Simulated opponent committed first. Choose a rebattle position.</p>
+          <button className="timeline-primary" disabled={stealSlot === null} onClick={resolveSteal}>Lock rebattle <span>↗</span></button>
+          <button className="timeline-secondary" onClick={() => {setStealMode(false);setStealSlot(null);}}>Cancel simulation</button>
         </div>
       ) : (
         <div className={`timeline-feedback ${result}`}>
           <div className="feedback-heading">
-            <span className="feedback-icon">
-              {result === "correct" ? "✓" : "×"}
-            </span>
-
+            <span className="feedback-icon">{result === "correct" ? "✓" : "×"}</span>
             <div>
-              <strong>
-                {result === "correct"
-                  ? "Correct placement!"
-                  : "Not quite right."}
-              </strong>
-
-              <span>
-                {result === "correct"
-                  ? "The card has been added to your timeline."
-                  : "The card was discarded. The timeline stays unchanged."}
-              </span>
+              <strong>{stealResult !== null ? (stealResult ? "Simulated steal succeeds!" : "Simulated steal fails.") : result === "correct" ? "Correct placement!" : "Not quite right."}</strong>
+              <span>{stealResult !== null ? (stealResult ? "Card ownership transfer is a multiplayer step not yet wired into this prototype." : "The original placement is resolved; the card is awarded or discarded.") : result === "correct" ? "The card has been added to your timeline." : "The card was discarded. The timeline stays unchanged."}</span>
             </div>
           </div>
-
-          <button
-            className="timeline-primary"
-            onClick={continueGame}
-          >
-            Next song <span>↗</span>
-          </button>
+          <button className="timeline-primary" onClick={continueGame}>Next song <span>↗</span></button>
         </div>
       )}
     </section>
